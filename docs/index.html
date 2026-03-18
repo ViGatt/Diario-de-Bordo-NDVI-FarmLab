@@ -814,6 +814,7 @@
   .file-name { color: var(--white); font-family: 'Space Mono', monospace; font-size: 11px; }
   .file-desc { color: var(--muted); font-size: 12px; margin-left: auto; }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -851,6 +852,9 @@
     </button>
     <button class="tab-btn" onclick="switchTab('talhoes', this)">
       <span class="tab-num">04</span>Talhões
+    </button>
+    <button class="tab-btn" onclick="switchTab('clima', this)">
+      <span class="tab-num">05</span>Clima<span class="tab-new-badge">NOVO</span>
     </button>
   </nav>
 </header>
@@ -1169,6 +1173,156 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════ TAB 05 — CLIMA ═══════════════════════════ -->
+  <div id="tab-clima" class="tab-panel">
+    <div class="section-label">// 05 — Dados Meteorológicos</div>
+    <h2>Estação Metos Pro — Unimar Pesquisa</h2>
+
+    <div class="stats-row">
+      <div class="stat-pill">
+        <span class="stat-value">2.785</span>
+        <span class="stat-label">Registros horários</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">748 mm</span>
+        <span class="stat-label">Precipitação total</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">24,1°C</span>
+        <span class="stat-label">Temp. média geral</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">35,9°C</span>
+        <span class="stat-label">Pico de temperatura</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">129,4 mm</span>
+        <span class="stat-label">Maior evento (09/Dez)</span>
+      </div>
+    </div>
+
+    <!-- CHART 1: Precipitação diária -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b1">Precipitação Diária</span>
+        <span style="color:var(--muted);font-size:13px">Nov/2025 – Fev/2026 · mm/dia</span>
+      </div>
+      <canvas id="chartPrec" height="110"></canvas>
+    </div>
+
+    <!-- CHART 2: Temperatura -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b2">Temperatura Diária</span>
+        <span style="color:var(--muted);font-size:13px">Mín / Média / Máx · °C</span>
+      </div>
+      <canvas id="chartTemp" height="110"></canvas>
+    </div>
+
+    <!-- CHART 3: Radiação e Umidade -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b3">Radiação Solar &amp; Umidade Relativa</span>
+        <span style="color:var(--muted);font-size:13px">W/m² e %</span>
+      </div>
+      <canvas id="chartRadUmid" height="110"></canvas>
+    </div>
+
+    <!-- BALANÇO HÍDRICO MENSAL -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b1">Balanço Hídrico Mensal</span>
+        <span style="color:var(--muted);font-size:13px">Precipitação vs. Evapotranspiração · mm</span>
+      </div>
+      <canvas id="chartBalanco" height="120"></canvas>
+    </div>
+
+    <!-- TABELA RESUMO MENSAL -->
+    <h2 style="margin-top:8px">Resumo Mensal</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Mês</th>
+            <th>Prec. (mm)</th>
+            <th>Dias c/ chuva</th>
+            <th>T. Mín (°C)</th>
+            <th>T. Méd (°C)</th>
+            <th>T. Máx (°C)</th>
+            <th>ETo (mm)</th>
+            <th>Balanço</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">Nov/2025</td>
+            <td>102,2</td><td>12</td>
+            <td>13,6</td><td>22,9</td><td>35,0</td>
+            <td>139,0</td>
+            <td style="color:var(--red)">−36,8</td>
+          </tr>
+          <tr>
+            <td class="mono">Dez/2025</td>
+            <td>320,2</td><td>13</td>
+            <td>15,6</td><td>25,2</td><td>35,9</td>
+            <td>140,3</td>
+            <td style="color:var(--ndvi)">+179,9</td>
+          </tr>
+          <tr>
+            <td class="mono">Jan/2026</td>
+            <td>102,4</td><td>15</td>
+            <td>15,4</td><td>23,9</td><td>33,5</td>
+            <td>147,7</td>
+            <td style="color:var(--red)">−45,3</td>
+          </tr>
+          <tr>
+            <td class="mono">Fev/2026</td>
+            <td>223,4</td><td>17</td>
+            <td>17,4</td><td>24,6</td><td>34,5</td>
+            <td>94,4</td>
+            <td style="color:var(--ndvi)">+129,0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TOP EVENTOS -->
+    <div class="card-grid">
+      <div class="card">
+        <h3>🌧️ Top 5 Eventos de Chuva</h3>
+        <table>
+          <thead><tr><th>Data</th><th>Precipitação</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">09/Dez/2025</td><td style="color:var(--red);font-weight:700">129,4 mm</td></tr>
+            <tr><td class="mono">08/Fev/2026</td><td style="color:var(--red)">91,4 mm</td></tr>
+            <tr><td class="mono">14/Dez/2025</td><td>77,0 mm</td></tr>
+            <tr><td class="mono">13/Dez/2025</td><td>53,4 mm</td></tr>
+            <tr><td class="mono">01/Jan/2026</td><td>29,2 mm</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>🔥 Picos Térmicos</h3>
+        <table>
+          <thead><tr><th>Mês</th><th>Máx. Absoluta</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">Nov/2025</td><td>35,0°C</td></tr>
+            <tr><td class="mono">Dez/2025</td><td style="color:var(--red);font-weight:700">35,9°C</td></tr>
+            <tr><td class="mono">Jan/2026</td><td>33,5°C</td></tr>
+            <tr><td class="mono">Fev/2026</td><td>34,5°C</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>🔗 Impacto no NDVI</strong>
+      Dezembro registrou 320 mm de chuva com evento de 129,4 mm em um único dia (09/12) — espere alto número de imagens nubladas (<code>b1_valid_pixels = 0</code>) nesse período.
+      Janeiro apresentou déficit hídrico de 45,3 mm durante o florescimento — fase crítica do milho. Possível stress hídrico detectável na curva NDVI.
+      Os eventos de chuva intensa de Fevereiro (91,4 mm em 08/02) podem ter comprometido a qualidade das Imagens NDVI #2.
+    </div>
+  </div>
+
 </main>
 
 <footer>
@@ -1278,5 +1432,211 @@ git push</div>
     }, 300);
   }
 </script>
+<script>
+// ── CLIMATE DATA ──
+const labelsDaily = ["01/11","02/11","03/11","04/11","05/11","06/11","07/11","08/11","09/11","10/11","11/11","12/11","13/11","14/11","15/11","16/11","17/11","18/11","19/11","20/11","21/11","22/11","23/11","24/11","25/11","26/11","27/11","28/11","29/11","30/11","01/12","02/12","03/12","04/12","05/12","06/12","07/12","08/12","09/12","10/12","11/12","12/12","13/12","14/12","15/12","16/12","17/12","18/12","19/12","20/12","21/12","22/12","23/12","24/12","25/12","26/12","27/12","28/12","29/12","30/12","31/12","01/01","02/01","03/01","04/01","05/01","06/01","07/01","08/01","09/01","10/01","11/01","12/01","13/01","14/01","15/01","16/01","17/01","18/01","19/01","20/01","21/01","22/01","23/01","24/01","25/01","26/01","27/01","28/01","29/01","30/01","31/01","01/02","02/02","03/02","04/02","05/02","06/02","07/02","08/02","09/02","10/02","11/02","12/02","13/02","14/02","15/02","16/02","17/02","18/02","19/02","20/02","21/02","22/02","23/02","24/02","25/02"];
+const dataPrec  = [0.0,20.8,4.0,0.0,20.0,0.2,0.0,16.2,0.0,0.0,0.0,0.0,11.2,0.0,1.2,1.6,9.0,2.6,0.0,0.0,0.0,0.0,0.2,15.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.6,0.0,0.0,0.0,0.0,0.6,19.2,129.4,0.0,0.0,11.8,53.4,77.0,0.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4.8,0.4,2.2,9.4,0.0,11.2,29.2,15.8,0.2,0.0,0.0,0.0,0.0,6.0,0.0,13.4,2.8,7.0,1.2,0.2,8.0,4.8,0.2,2.8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2.4,8.4,0.0,0.0,15.2,8.6,9.2,6.6,3.4,0.0,0.0,91.4,8.4,0.6,22.0,2.2,0.4,13.6,0.0,5.4,0.0,0.6,0.0,0.0,11.0,11.0,13.8,0.0,0.0];
+const dataTMin  = [19.1,17.7,18.9,20.8,18.9,17.8,14.9,18.6,15.1,13.6,14.0,19.4,19.0,20.0,18.8,18.6,18.5,16.7,14.0,16.4,16.7,22.4,18.1,16.9,15.0,16.3,16.4,14.9,21.8,23.7,23.5,21.0,20.7,19.7,17.4,20.6,23.0,20.6,20.4,20.4,18.2,19.4,19.0,18.6,20.8,20.8,17.4,15.6,17.6,20.3,20.4,22.7,23.9,24.7,23.2,22.8,21.6,22.5,20.8,21.8,21.4,20.7,20.9,20.5,20.5,17.8,16.8,19.2,21.4,21.5,19.9,19.6,19.4,18.5,19.6,19.7,19.8,19.8,21.1,20.0,17.5,15.4,15.8,15.6,17.3,17.4,18.7,20.0,19.2,20.1,20.2,20.9,20.5,20.4,20.6,20.4,20.2,19.9,20.6,17.4,18.5,20.1,21.2,21.0,21.5,21.2,21.4,22.7,23.8,22.3,21.1,21.8,20.2,20.5,20.0,20.7,22.9];
+const dataTMed  = [24.0,20.1,22.9,26.2,21.5,21.9,24.0,21.6,20.7,20.2,22.9,26.8,22.6,21.7,20.4,22.1,21.7,20.0,21.4,22.7,25.1,27.9,24.4,19.8,21.2,22.5,22.2,23.3,27.8,29.1,28.2,24.6,25.6,24.2,25.2,27.0,26.4,25.1,21.5,24.0,24.2,22.3,21.1,21.1,23.8,23.4,21.6,21.8,23.7,24.9,26.7,27.8,28.1,28.9,28.8,29.3,27.6,27.2,25.4,26.6,26.2,24.6,22.3,23.7,25.0,22.5,23.3,24.5,25.6,26.2,24.3,24.5,24.5,22.3,24.4,22.2,23.5,24.3,24.6,24.2,22.0,21.2,21.5,21.9,23.5,24.1,25.4,26.5,24.9,23.5,23.6,26.0,23.1,22.2,22.8,22.8,24.2,25.6,26.1,22.7,22.2,22.7,22.7,24.6,24.8,25.6,26.8,27.9,28.6,25.9,26.6,26.4,24.2,23.9,22.8,24.1,23.1];
+const dataTMax  = [30.4,23.1,28.6,32.1,25.3,28.5,32.2,26.1,27.4,26.9,30.7,34.2,28.1,23.2,22.4,26.9,24.0,25.1,28.1,28.9,33.0,34.0,31.2,24.4,28.1,28.6,28.5,30.6,34.4,35.0,34.0,30.9,31.8,30.9,34.0,34.2,33.5,29.5,23.4,28.6,29.8,24.3,24.4,23.6,28.6,27.2,26.8,27.6,30.4,30.4,32.4,32.9,32.6,34.3,35.3,35.9,34.6,32.6,33.0,32.8,33.6,31.3,26.4,29.0,31.9,29.8,29.8,30.5,31.2,32.4,32.4,31.2,31.0,29.3,31.3,29.1,30.7,30.5,31.2,30.6,28.4,28.9,29.0,28.7,31.3,32.1,32.1,33.5,31.9,31.4,29.4,32.6,28.9,26.2,26.8,28.2,29.7,31.9,33.3,30.2,28.2,27.5,27.3,30.0,30.9,33.7,33.5,34.5,34.3,32.1,32.3,33.6,31.1,30.9,28.0,29.3,23.4];
+const dataRad   = [228.1,69.0,217.8,289.4,61.0,266.3,325.8,125.0,342.0,343.6,321.1,329.6,221.7,103.3,79.5,139.5,101.6,197.7,338.7,335.4,336.9,293.8,243.5,175.2,328.9,325.3,335.2,324.8,315.6,300.2,215.3,197.6,229.8,227.1,298.9,283.8,200.0,192.6,47.2,280.2,329.7,62.9,91.9,57.9,219.7,145.5,279.1,238.0,236.2,231.1,302.1,252.0,256.0,289.2,289.2,286.7,280.6,236.2,260.8,254.8,293.1,273.5,104.1,225.1,292.2,305.5,300.0,234.9,274.7,243.9,174.8,267.7,248.3,218.2,294.6,168.2,257.3,257.5,246.0,307.6,331.5,311.1,251.3,285.1,309.1,275.9,240.6,299.5,307.5,233.6,223.7,306.9,132.5,134.6,151.2,161.5,200.6,320.9,275.9,202.0,185.6,213.2,136.0,241.9,205.0,252.2,286.8,257.3,278.2,213.4,247.0,240.7,155.4,227.6,141.9,188.0,0.0];
+const dataUmid  = [75.9,95.8,87.8,76.0,93.8,82.8,65.6,89.5,73.1,60.7,60.3,54.4,85.5,87.3,89.6,90.9,95.2,79.3,55.2,53.5,52.4,44.4,72.3,92.1,71.9,59.3,51.9,58.0,43.3,38.5,52.4,76.7,74.1,73.2,61.2,59.6,67.5,76.5,99.9,72.5,66.0,87.6,98.2,99.8,93.7,92.3,80.6,77.1,81.8,80.1,70.4,60.4,54.4,52.0,60.3,59.9,72.8,75.3,82.9,78.2,82.3,87.9,98.4,90.3,80.1,78.3,74.2,77.6,76.4,72.3,82.8,83.8,83.6,90.0,78.7,93.2,89.3,85.7,87.6,81.6,68.5,71.4,70.3,69.4,71.4,69.7,72.3,68.2,77.6,86.1,87.6,75.4,93.8,96.6,96.0,95.7,87.0,72.9,73.1,88.7,90.2,94.5,97.4,86.5,84.9,80.6,74.9,66.7,62.0,76.9,73.6,74.0,84.6,88.0,90.8,89.2,96.6];
+
+const labelsMonthly = ['Nov/2025','Dez/2025','Jan/2026','Fev/2026'];
+const dataMonthPrec = [102.2, 320.2, 102.4, 223.4];
+const dataMonthEto  = [139.0, 140.3, 147.7, 94.4];
+const dataMonthBal  = [-36.8, 179.9, -45.3, 129.0];
+
+const GRID   = 'rgba(31,46,36,0.5)';
+const TICK   = '#6b8f77';
+const GREEN  = '#3ddc84';
+const YELLOW = '#f5c842';
+const RED    = '#e05c5c';
+const BLUE   = '#5ca8e0';
+const ORANGE = '#f59342';
+
+Chart.defaults.color = TICK;
+Chart.defaults.font.family = "'Space Mono', monospace";
+Chart.defaults.font.size   = 10;
+
+const baseOpts = (yLabel, extra={}) => ({
+  responsive: true,
+  animation: { duration: 600 },
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { labels: { color: TICK, boxWidth: 12, padding: 16 } },
+    tooltip: {
+      backgroundColor: '#161e19',
+      borderColor: '#1f2e24',
+      borderWidth: 1,
+      titleColor: GREEN,
+      bodyColor: '#d4e8da',
+      padding: 10,
+    }
+  },
+  scales: {
+    x: {
+      grid: { color: GRID },
+      ticks: { color: TICK, maxTicksLimit: 18, maxRotation: 45 }
+    },
+    y: {
+      grid: { color: GRID },
+      ticks: { color: TICK },
+      title: { display: true, text: yLabel, color: TICK }
+    },
+    ...extra
+  }
+});
+
+// ── CHART 1: Precipitação ──
+new Chart(document.getElementById('chartPrec'), {
+  type: 'bar',
+  data: {
+    labels: labelsDaily,
+    datasets: [{
+      label: 'Precipitação (mm)',
+      data: dataPrec,
+      backgroundColor: dataPrec.map(v => v >= 50 ? RED : v >= 20 ? YELLOW : BLUE),
+      borderRadius: 2,
+    }]
+  },
+  options: {
+    ...baseOpts('mm/dia'),
+    plugins: {
+      ...baseOpts('mm').plugins,
+      annotation: {}
+    }
+  }
+});
+
+// ── CHART 2: Temperatura ──
+new Chart(document.getElementById('chartTemp'), {
+  type: 'line',
+  data: {
+    labels: labelsDaily,
+    datasets: [
+      {
+        label: 'T. Máxima (°C)',
+        data: dataTMax,
+        borderColor: RED,
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+      },
+      {
+        label: 'T. Média (°C)',
+        data: dataTMed,
+        borderColor: YELLOW,
+        backgroundColor: 'rgba(245,200,66,0.08)',
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.3,
+      },
+      {
+        label: 'T. Mínima (°C)',
+        data: dataTMin,
+        borderColor: BLUE,
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+      }
+    ]
+  },
+  options: baseOpts('°C')
+});
+
+// ── CHART 3: Radiação + Umidade ──
+new Chart(document.getElementById('chartRadUmid'), {
+  type: 'line',
+  data: {
+    labels: labelsDaily,
+    datasets: [
+      {
+        label: 'Radiação Solar (W/m²)',
+        data: dataRad,
+        borderColor: ORANGE,
+        backgroundColor: 'rgba(245,147,66,0.08)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.3,
+        yAxisID: 'yRad',
+      },
+      {
+        label: 'Umidade Rel. Média (%)',
+        data: dataUmid,
+        borderColor: BLUE,
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        yAxisID: 'yUmid',
+      }
+    ]
+  },
+  options: {
+    ...baseOpts(''),
+    scales: {
+      x: { grid: { color: GRID }, ticks: { color: TICK, maxTicksLimit: 18, maxRotation: 45 } },
+      yRad:  { position: 'left',  grid: { color: GRID }, ticks: { color: ORANGE }, title: { display: true, text: 'W/m²', color: ORANGE } },
+      yUmid: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: BLUE }, title: { display: true, text: '%', color: BLUE }, min: 0, max: 100 }
+    }
+  }
+});
+
+// ── CHART 4: Balanço Hídrico Mensal ──
+new Chart(document.getElementById('chartBalanco'), {
+  type: 'bar',
+  data: {
+    labels: labelsMonthly,
+    datasets: [
+      {
+        label: 'Precipitação (mm)',
+        data: dataMonthPrec,
+        backgroundColor: 'rgba(92,168,224,0.7)',
+        borderRadius: 4,
+        order: 2,
+      },
+      {
+        label: 'Evapotranspiração (mm)',
+        data: dataMonthEto,
+        backgroundColor: 'rgba(245,200,66,0.7)',
+        borderRadius: 4,
+        order: 2,
+      },
+      {
+        label: 'Balanço (Prec − ETo)',
+        data: dataMonthBal,
+        type: 'line',
+        borderColor: GREEN,
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
+        pointBackgroundColor: dataMonthBal.map(v => v >= 0 ? GREEN : RED),
+        pointRadius: 6,
+        tension: 0.2,
+        order: 1,
+        yAxisID: 'yBal',
+      }
+    ]
+  },
+  options: {
+    ...baseOpts('mm'),
+    scales: {
+      x: { grid: { color: GRID }, ticks: { color: TICK } },
+      y:    { grid: { color: GRID }, ticks: { color: TICK }, title: { display: true, text: 'mm', color: TICK } },
+      yBal: {
+        position: 'right',
+        grid: { drawOnChartArea: false },
+        ticks: { color: GREEN },
+        title: { display: true, text: 'Balanço (mm)', color: GREEN },
+      }
+    }
+  }
+});
+</script>
+
 </body>
 </html>
