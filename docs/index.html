@@ -862,6 +862,9 @@
     <button class="tab-btn" onclick="switchTab('correlacao', this)">
       <span class="tab-num">07</span>Correlação<span class="tab-new-badge">NOVO</span>
     </button>
+    <button class="tab-btn" onclick="switchTab('heterogeneidade', this)">
+      <span class="tab-num">08</span>Heterogeneidade<span class="tab-new-badge">NOVO</span>
+    </button>
   </nav>
 </header>
 
@@ -1608,6 +1611,236 @@
     </div>
   </div>
 
+  <!-- ═══════════════════════════ TAB 08 — HETEROGENEIDADE ═══════════════════════════ -->
+  <div id="tab-heterogeneidade" class="tab-panel">
+    <div class="section-label">// 08 — Heterogeneidade Espacial</div>
+    <h2>Variabilidade Interna dos Talhões</h2>
+    <p style="color:var(--muted);margin-bottom:24px">Análise do desvio padrão do NDVI (<code>b1_std</code>) e do coeficiente de variação (<code>CV = std/média</code>) ao longo da safra. Altos valores indicam zonas de vigor diferente dentro do mesmo talhão.</p>
+
+    <!-- ── CONCEITO ── -->
+    <h2>Entendendo o Conceito</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>🛰️ O que é heterogeneidade espacial?</h3>
+        <p>Cada pixel de uma imagem Sentinel-2 representa um pedaço de <strong>10×10 metros</strong> do talhão, com seu próprio valor de NDVI. Num talhão ideal e uniforme, todos os pixels teriam exatamente o mesmo valor. Na realidade, nunca é assim.</p>
+        <p><strong>Heterogeneidade</strong> é o quanto os pixels <em>discordam entre si</em> dentro do mesmo talhão. Pense assim: se o NDVI médio é a <em>"nota da turma"</em>, o desvio padrão diz se todos tiraram notas parecidas — ou se metade tirou 10 e a outra metade tirou 4.</p>
+      </div>
+      <div class="card">
+        <h3>📐 O que o b1_std mede?</h3>
+        <p>O <code>b1_std</code> é o <strong>desvio padrão do NDVI</strong> de todos os pixels válidos de uma imagem:</p>
+        <div class="ndvi-scale" style="margin:12px 0">
+          <div class="ndvi-bar">
+            <div class="ndvi-color" style="background:var(--ndvi)"></div>
+            <span class="ndvi-range">STD ~0,10</span>
+            <span class="ndvi-name">Talhão uniforme — plantas no mesmo estágio</span>
+          </div>
+          <div class="ndvi-bar">
+            <div class="ndvi-color" style="background:var(--yellow)"></div>
+            <span class="ndvi-range">STD ~0,18</span>
+            <span class="ndvi-name">Variação moderada — zonas em ritmos distintos</span>
+          </div>
+          <div class="ndvi-bar">
+            <div class="ndvi-color" style="background:var(--red)"></div>
+            <span class="ndvi-range">STD &gt; 0,25</span>
+            <span class="ndvi-name">Alta variação — stress localizado ou transição fenológica</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📊 b1_std vs. Coeficiente de Variação (CV)</h3>
+      <p>O problema do STD puro é que ele não considera o nível do NDVI médio. Um STD de 0,15 num talhão com NDVI médio 0,20 é <strong>enorme</strong> (variação relativa de 75%), mas num talhão com NDVI médio 0,80 é <strong>pequeno</strong> (variação relativa de apenas 19%). O CV resolve isso:</p>
+      <div class="note-box" style="margin:12px 0">
+        <strong>Fórmula</strong>
+        <code>CV = b1_std ÷ b1_mean</code> — quanto menor o CV, mais uniforme o talhão está <em>em relação ao seu próprio nível de vegetação</em>.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🌱 Por que isso importa agronomicamente?</h3>
+      <p><strong>Alta heterogeneidade = partes do talhão performando de forma diferente.</strong> As causas mais comuns no milho são:</p>
+      <div class="card-grid" style="margin-top:12px;gap:10px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">SOLO</div>
+          <p style="margin:0;font-size:13px">Variação natural de textura, matéria orgânica e drenagem entre zonas do talhão</p>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">STAND</div>
+          <p style="margin:0;font-size:13px">Falhas de emergência — sementes que não germinaram em áreas específicas</p>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">MANEJO</div>
+          <p style="margin:0;font-size:13px">Distribuição desigual de fertilizantes ou defensivos ao longo do talhão</p>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">STRESS</div>
+          <p style="margin:0;font-size:13px">Stress hídrico, pragas ou compactação concentrados em zonas específicas</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔬 Heterogeneidade e Agricultura de Precisão 4.0</h3>
+      <p>O STD alto não é necessariamente ruim — depende do contexto:</p>
+      <table style="margin-top:12px">
+        <thead><tr><th>Situação</th><th>STD alto significa</th><th>Ação indicada</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Nov/25 — Estabelecimento</td>
+            <td class="muted">Plantas em estágios distintos de emergência</td>
+            <td class="muted">Normal — aguardar uniformização</td>
+          </tr>
+          <tr>
+            <td>Talhão com manejo 4.0</td>
+            <td style="color:var(--ndvi)">Zonas de manejo se diferenciando como planejado</td>
+            <td class="muted">✅ Resultado esperado e positivo</td>
+          </tr>
+          <tr>
+            <td>Talhão Conv. em crescimento</td>
+            <td style="color:var(--yellow)">Variabilidade natural não gerenciada</td>
+            <td class="muted">⚠️ Identificar zonas para futuro 4.0</td>
+          </tr>
+          <tr>
+            <td>STD alto + NDVI baixo</td>
+            <td style="color:var(--red)">Stress localizado ou falha de stand</td>
+            <td class="muted">🚨 Investigar e intervir</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider">
+    <h2>Análise dos Dados — Safra 2025–2026</h2>
+    <div class="stats-row">
+      <div class="stat-pill">
+        <span class="stat-value" style="color:var(--ndvi)">0,186</span>
+        <span class="stat-label">STD médio Silagem 4.0</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">0,158</span>
+        <span class="stat-label">STD médio Silagem Conv.</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">0,144</span>
+        <span class="stat-label">STD médio Grão 4.0</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">0,143</span>
+        <span class="stat-label">STD médio Grão Conv.</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value" style="color:var(--yellow)">Nov/25</span>
+        <span class="stat-label">Mês mais heterogêneo</span>
+      </div>
+    </div>
+
+    <!-- CHART 1: STD temporal por talhão -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b1">Evolução do b1_std — 4 Talhões</span>
+        <span style="color:var(--muted);font-size:13px">Desvio padrão do NDVI ao longo do tempo</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Picos de STD indicam momentos de transição fenológica — quando partes do talhão estão em estágios diferentes de desenvolvimento.</p>
+      <canvas id="chartHeteroStd" height="120"></canvas>
+    </div>
+
+    <!-- CHART 2: CV por talhão -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b2">Coeficiente de Variação (CV = std / média)</span>
+        <span style="color:var(--muted);font-size:13px">Heterogeneidade relativa — normaliza o STD pelo NDVI médio</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">CV alto no pré-plantio e estabelecimento é esperado. CV alto durante o crescimento activo sinaliza zonas problemáticas dentro do talhão.</p>
+      <canvas id="chartHeteroCV" height="120"></canvas>
+    </div>
+
+    <!-- CHART 3: STD médio mensal comparativo -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b3">STD Médio Mensal — Comparativo</span>
+        <span style="color:var(--muted);font-size:13px">Evolução da heterogeneidade mês a mês</span>
+      </div>
+      <canvas id="chartHeteroMensal" height="110"></canvas>
+    </div>
+
+    <!-- CHART 4: Evolução de classes por fase fenológica -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b1">Distribuição de Classes por Fase Fenológica</span>
+        <span style="color:var(--muted);font-size:13px">% pixels por classe de vigor em cada fase da safra · Silagem 4.0 vs Grão 4.0</span>
+      </div>
+      <canvas id="chartHeteroFase" height="130"></canvas>
+    </div>
+
+    <!-- ANÁLISE 4.0 vs CONV -->
+    <h2 style="margin-top:8px">Ag. Precisão 4.0 vs Convencional — Variabilidade</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>🌿 Silagem: 4.0 com +17,7% de STD</h3>
+        <table>
+          <thead><tr><th>Talhão</th><th>STD médio</th><th>CV médio</th><th>Corr. STD×NDVI</th></tr></thead>
+          <tbody>
+            <tr><td>Silagem 4.0</td><td style="color:var(--ndvi);font-weight:700">0,1864</td><td>0,398</td><td style="color:var(--blue)">−0,181</td></tr>
+            <tr><td>Silagem Conv.</td><td>0,1583</td><td>0,354</td><td style="color:var(--blue)">−0,187</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box" style="margin-top:12px;padding:10px 14px;font-size:12px">
+          <strong>✅ STD maior no 4.0 = esperado</strong>
+          Zonas de manejo diferenciado amplificam o contraste de vigor entre áreas. A correlação negativa confirma que no pico, o talhão se torna mais homogêneo — as zonas convergem para alto vigor.
+        </div>
+      </div>
+      <div class="card">
+        <h3>🌾 Grão: 4.0 ≈ Conv. (+0,6%)</h3>
+        <table>
+          <thead><tr><th>Talhão</th><th>STD médio</th><th>CV médio</th><th>Corr. STD×NDVI</th></tr></thead>
+          <tbody>
+            <tr><td>Grão 4.0</td><td>0,1435</td><td>0,368</td><td style="color:var(--yellow)">+0,532</td></tr>
+            <tr><td>Grão Conv.</td><td>0,1426</td><td>0,343</td><td style="color:var(--yellow)">+0,437</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box" style="margin-top:12px;padding:10px 14px;font-size:12px">
+          <strong>⚠️ Correlação positiva STD×NDVI</strong>
+          Quanto maior o NDVI nos talhões de grão, maior a variabilidade. Zonas dentro do talhão crescem em ritmos distintos — potencial alvo para manejo por zonas futuro.
+        </div>
+      </div>
+    </div>
+
+    <!-- PICO SILAGEM NO PICO NDVI -->
+    <h2>Distribuição de Pixels no Pico (16/Jan/2026)</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Talhão</th><th>Solo</th><th>Veg. Baixa</th><th>Veg. Mod.</th><th>Veg. Alta</th><th>Veg. Densa</th><th>STD no pico</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Silagem 4.0</td><td>1,1%</td><td>0,8%</td><td>1,3%</td><td>13,0%</td>
+            <td style="color:var(--ndvi);font-weight:700">82,2% 🏆</td><td class="muted">0,170</td>
+          </tr>
+          <tr>
+            <td>Silagem Conv.</td><td>1,4%</td><td>0,8%</td><td>3,5%</td><td>19,4%</td>
+            <td style="color:var(--ndvi)">75,0%</td><td class="muted">0,137</td>
+          </tr>
+          <tr>
+            <td>Grão 4.0</td><td>3,4%</td><td>4,7%</td><td>8,0%</td><td>21,5%</td>
+            <td style="color:var(--yellow)">62,1%</td><td class="muted">0,200</td>
+          </tr>
+          <tr>
+            <td>Grão Conv.</td><td>3,4%</td><td>4,5%</td><td>5,8%</td><td>19,6%</td>
+            <td style="color:var(--yellow)">66,7%</td><td class="muted">0,157</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box">
+      <strong>🔬 Interpretação Agronômica</strong>
+      A <strong>Silagem 4.0</strong> atingiu <strong>82% de pixels com vegetação densa</strong> no pico — a maior cobertura registrada — com STD relativamente baixo (0,170), indicando alta uniformidade no vigor máximo. Isso sugere que o manejo por zonas nivelou o desempenho para cima. Nos <strong>talhões de Grão</strong>, a correlação positiva STD×NDVI revela zonas com ritmos de crescimento distintos — informação valiosa para definir <strong>zonas de manejo futuras</strong>. O <strong>STD elevado de novembro</strong> em todos os talhões corresponde ao período de estabelecimento heterogêneo — normal na emergência do milho, quando plantas em diferentes estágios coexistem no mesmo talhão.
+    </div>
+  </div>
+
 </main>
 
 <footer>
@@ -2167,6 +2400,114 @@ new Chart(document.getElementById('chartCorrPrec'), {
       yNdvi:  { position:'left',   grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1, title:{display:true,text:'NDVI',color:TICK} },
       yClim:  { position:'right',  grid:{drawOnChartArea:false}, ticks:{color:BLUE},   title:{display:true,text:'mm',color:BLUE} },
       yClim2: { position:'right',  grid:{drawOnChartArea:false}, ticks:{color:ORANGE}, display:false }
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// HETEROGENEIDADE CHARTS
+// ═══════════════════════════════════════════════════════
+
+const hs40d = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const hs40s = [0.1578,0.1606,0.159,0.1461,0.1567,0.1662,0.1649,0.1741,0.1689,0.1885,0.1621,0.1687,0.1837,0.2012,0.2306,0.2346,0.2415,0.2695,0.2,0.2341,0.2149,0.1715,0.1669,0.1291,0.1704,0.1543,0.1714,0.235,0.2523,0.1564];
+const hs40cv= [0.2713,0.2706,0.2895,0.3304,0.3486,0.3896,0.4144,0.4337,0.4402,0.4935,0.5763,0.6004,0.4285,0.6103,0.5586,0.5552,0.5685,0.5263,0.4235,0.5503,0.3222,0.2328,0.2168,0.281,0.2032,0.1885,0.2315,0.3434,0.6482,0.2002];
+
+const hscd  = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","20/02/26"];
+const hscds = [0.1364,0.1378,0.1369,0.1226,0.132,0.1357,0.1332,0.1394,0.1348,0.1568,0.1815,0.1281,0.1526,0.2029,0.2044,0.2037,0.2114,0.2147,0.1806,0.1506,0.157,0.1435,0.1952,0.1079,0.1372,0.1246,0.1255,0.2768,0.1278];
+const hscdcv= [0.2454,0.2426,0.2614,0.284,0.3002,0.32,0.3398,0.3503,0.3531,0.4473,0.8757,0.486,0.3587,0.55,0.4963,0.487,0.5072,0.4123,0.3883,0.3821,0.2515,0.206,0.2838,0.2442,0.1658,0.1544,0.1679,0.5456,0.1628];
+
+const hg40d = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","15/02/26","20/02/26"];
+const hg40s = [0.1291,0.1271,0.1173,0.0973,0.1001,0.0958,0.089,0.0891,0.0834,0.0873,0.0929,0.0656,0.1103,0.1815,0.1743,0.1804,0.1901,0.2142,0.1663,0.1482,0.1581,0.1667,0.2212,0.0827,0.2002,0.1735,0.1912,0.199,0.2353,0.1102,0.1727];
+const hg40cv= [0.2986,0.2914,0.2985,0.3081,0.32,0.3354,0.3319,0.3284,0.322,0.3166,0.3453,0.2977,0.3251,0.5009,0.5415,0.564,0.5743,0.5404,0.441,0.3314,0.2763,0.2543,0.9193,0.2879,0.2653,0.2412,0.3355,0.3473,0.4252,0.1916,0.258];
+
+const hgcd  = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const hgcds = [0.1307,0.1305,0.1243,0.1078,0.1124,0.1129,0.1066,0.1083,0.1017,0.1073,0.093,0.0575,0.1127,0.1641,0.1926,0.2007,0.2143,0.2237,0.1804,0.1627,0.1583,0.1492,0.0749,0.1609,0.1401,0.1663,0.1322,0.2672,0.1429];
+const hgcdcv= [0.2809,0.2772,0.2944,0.3194,0.3317,0.3569,0.362,0.3677,0.3602,0.3569,0.4001,0.2464,0.3284,0.3737,0.5341,0.5448,0.5534,0.4906,0.4198,0.4285,0.2631,0.2221,0.2999,0.211,0.191,0.2697,0.1998,0.468,0.2068];
+
+const hOpts = (yLabel, yMax) => ({
+  responsive: true, animation:{duration:600},
+  interaction:{mode:'index',intersect:false},
+  plugins:{
+    legend:{labels:{color:TICK,boxWidth:12,padding:14}},
+    tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}
+  },
+  scales:{
+    x:{grid:{color:GRID},ticks:{color:TICK,maxTicksLimit:14,maxRotation:45}},
+    y:{grid:{color:GRID},ticks:{color:TICK},min:0,max:yMax,title:{display:true,text:yLabel,color:TICK}}
+  }
+});
+
+// Chart 1 — STD temporal
+new Chart(document.getElementById('chartHeteroStd'),{
+  type:'line',
+  data:{
+    labels: hs40d,
+    datasets:[
+      {label:'Silagem 4.0',  data:hs40s, borderColor:GREEN,  borderWidth:2.5,pointRadius:3,fill:false,tension:0.3},
+      {label:'Silagem Conv.',data:hscds, borderColor:BLUE,   borderWidth:2,  pointRadius:3,fill:false,tension:0.3},
+      {label:'Grão 4.0',    data:hg40s, borderColor:ORANGE, borderWidth:2,  pointRadius:3,fill:false,tension:0.3,borderDash:[5,3]},
+      {label:'Grão Conv.',  data:hgcds, borderColor:YELLOW, borderWidth:2,  pointRadius:3,fill:false,tension:0.3,borderDash:[5,3]},
+    ]
+  },
+  options: hOpts('b1_std', 0.35)
+});
+
+// Chart 2 — CV temporal
+new Chart(document.getElementById('chartHeteroCV'),{
+  type:'line',
+  data:{
+    labels: hs40d,
+    datasets:[
+      {label:'Silagem 4.0',  data:hs40cv, borderColor:GREEN,  borderWidth:2.5,pointRadius:3,fill:false,tension:0.3},
+      {label:'Silagem Conv.',data:hscdcv, borderColor:BLUE,   borderWidth:2,  pointRadius:3,fill:false,tension:0.3},
+      {label:'Grão 4.0',    data:hg40cv, borderColor:ORANGE, borderWidth:2,  pointRadius:3,fill:false,tension:0.3,borderDash:[5,3]},
+      {label:'Grão Conv.',  data:hgcdcv, borderColor:YELLOW, borderWidth:2,  pointRadius:3,fill:false,tension:0.3,borderDash:[5,3]},
+    ]
+  },
+  options: hOpts('CV (std/média)', 1.0)
+});
+
+// Chart 3 — STD médio mensal (grouped bar)
+new Chart(document.getElementById('chartHeteroMensal'),{
+  type:'bar',
+  data:{
+    labels:['Ago/25','Set/25','Out/25','Nov/25','Dez/25','Jan/26','Fev/26'],
+    datasets:[
+      {label:'Silagem 4.0',  data:[0.1560,0.1708,0.1762,0.2296,0.2245,0.1712,0.2043], backgroundColor:'rgba(61,220,132,0.7)',  borderRadius:3},
+      {label:'Silagem Conv.',data:[0.1331,0.1469,0.1404,0.2030,0.1538,0.1587,0.1278], backgroundColor:'rgba(92,168,224,0.7)',  borderRadius:3},
+      {label:'Grão 4.0',    data:[0.1142,0.0896,0.0879,0.1845,0.1532,0.1764,0.1727], backgroundColor:'rgba(245,147,66,0.7)',  borderRadius:3},
+      {label:'Grão Conv.',  data:[0.1212,0.1050,0.0851,0.1960,0.1605,0.1373,0.2050], backgroundColor:'rgba(245,200,66,0.7)',  borderRadius:3},
+    ]
+  },
+  options:{
+    responsive:true, animation:{duration:600},
+    plugins:{legend:{labels:{color:TICK,boxWidth:12,padding:12}},tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}},
+    scales:{
+      x:{grid:{color:GRID},ticks:{color:TICK}},
+      y:{grid:{color:GRID},ticks:{color:TICK},min:0,title:{display:true,text:'STD médio',color:TICK}}
+    }
+  }
+});
+
+// Chart 4 — Classes por fase (grouped bar — Silagem 4.0 vs Grão 4.0)
+new Chart(document.getElementById('chartHeteroFase'),{
+  type:'bar',
+  data:{
+    labels:['Pré-plantio\nSil 4.0','Pré-plantio\nGrão 4.0','Estabelecimento\nSil 4.0','Estabelecimento\nGrão 4.0','Crescimento/Pico\nSil 4.0','Crescimento/Pico\nGrão 4.0','Pós-pico\nSil 4.0','Pós-pico\nGrão 4.0'],
+    datasets:[
+      {label:'Solo',       data:[6.7,16.8,13.2,22.3,1.3,14.4,14.3,5.3],  backgroundColor:'#8b7355',borderRadius:2},
+      {label:'Veg. Baixa', data:[40.8,61.0,33.0,31.8,7.6,20.2,15.4,9.7], backgroundColor:'#8db87a',borderRadius:2},
+      {label:'Veg. Mod.',  data:[31.3,20.3,20.3,27.7,11.4,11.2,8.5,22.9], backgroundColor:'#4d9e5e',borderRadius:2},
+      {label:'Veg. Alta',  data:[15.6,1.7,19.6,16.9,28.0,36.0,28.1,52.9], backgroundColor:'#2a7a3c',borderRadius:2},
+      {label:'Veg. Densa', data:[3.9,0.1,12.4,1.2,50.4,18.1,32.9,9.2],   backgroundColor:GREEN,borderRadius:2},
+    ]
+  },
+  options:{
+    responsive:true, animation:{duration:600},
+    plugins:{legend:{labels:{color:TICK,boxWidth:12,padding:12}},tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}},
+    scales:{
+      x:{stacked:true,grid:{color:GRID},ticks:{color:TICK,maxRotation:30}},
+      y:{stacked:true,grid:{color:GRID},max:100,ticks:{color:TICK,callback:v=>v+'%'},title:{display:true,text:'% pixels',color:TICK}}
     }
   }
 });
