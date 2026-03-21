@@ -1744,6 +1744,10 @@
       </div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Picos de STD indicam momentos de transição fenológica — quando partes do talhão estão em estágios diferentes de desenvolvimento.</p>
       <canvas id="chartHeteroStd" height="120"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        O eixo Y mostra o desvio padrão do NDVI — quanto maior, mais os pixels divergem entre si. Observe que <strong>todos os talhões sobem em novembro</strong>: é o estabelecimento do milho, quando partes do talhão ainda têm solo exposto enquanto outras já estão com plantas emergidas. A <strong>Silagem 4.0 consistentemente mais alta</strong> que a Convencional reflete as zonas de manejo diferenciado atuando — cada zona recebe dose distinta de insumo e responde de forma diferente. O <strong>vale em janeiro</strong> (especialmente 16/jan, pico de NDVI) mostra que no auge do crescimento os talhões ficaram mais uniformes: todas as zonas convergiram para alto vigor simultaneamente.
+      </div>
     </div>
 
     <!-- CHART 2: CV por talhão -->
@@ -1754,6 +1758,10 @@
       </div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:14px">CV alto no pré-plantio e estabelecimento é esperado. CV alto durante o crescimento activo sinaliza zonas problemáticas dentro do talhão.</p>
       <canvas id="chartHeteroCV" height="120"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        O CV corrige uma limitação do STD: um desvio de 0,15 é muito diferente quando o NDVI médio é 0,20 (75% de variação!) ou 0,80 (apenas 19%). Por isso o CV é mais honesto para comparar momentos distintos da safra. Note o <strong>pico altíssimo em setembro/outubro</strong> — o NDVI médio estava baixo (solo exposto após a cultura anterior) e qualquer pequena diferença entre pixels gerava CV enorme. O <strong>ponto de maior estabilidade relativa</strong> ocorre em janeiro, quando o CV cai mesmo com STD ainda razoável — porque o denominador (NDVI médio) subiu muito. O <strong>spike do Grão 4.0 em 06/jan</strong> (CV ~0,92) é a anomalia de nuvem parcial identificada anteriormente: NDVI artificialmente baixo inflou o CV.
+      </div>
     </div>
 
     <!-- CHART 3: STD médio mensal comparativo -->
@@ -1763,6 +1771,10 @@
         <span style="color:var(--muted);font-size:13px">Evolução da heterogeneidade mês a mês</span>
       </div>
       <canvas id="chartHeteroMensal" height="110"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        Aqui cada barra é a média do STD de todas as imagens válidas daquele mês — uma visão agregada da heterogeneidade. <strong>Novembro se destaca como o mês mais variável</strong> em todos os talhões: é a fase de estabelecimento, quando a lavoura ainda não está homogeneamente coberta. <strong>Agosto e setembro</strong> têm STD baixo porque a cultura anterior (pré-colheita) cobria o talhão de forma mais uniforme. <strong>Dezembro e fevereiro</strong> apresentam STD elevado nos talhões de silagem — coincide com os grandes eventos de chuva registrados pelo Metos (320mm em dez e 91mm em 08/fev), que além de gerar nuvens podem ter causado encharcamento localizado e stress em partes do talhão.
+      </div>
     </div>
 
     <!-- CHART 4: Evolução de classes por fase fenológica -->
@@ -1772,7 +1784,12 @@
         <span style="color:var(--muted);font-size:13px">% pixels por classe de vigor em cada fase da safra · Silagem 4.0 vs Grão 4.0</span>
       </div>
       <canvas id="chartHeteroFase" height="130"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        Cada barra empilhada mostra como os pixels do talhão se distribuem entre as classes de vigor em cada fase da safra. A <strong>progressão ideal</strong> seria: Solo → Veg. Baixa → Veg. Mod. → Veg. Alta → Veg. Densa, e isso é exatamente o que se observa da esquerda para a direita. A <strong>diferença mais marcante entre Silagem 4.0 e Grão 4.0</strong> aparece na fase de Crescimento/Pico: a Silagem 4.0 teve <strong>50% dos pixels em vegetação densa</strong> contra apenas 18% do Grão 4.0 — reflexo da diferença de ciclo e biomassa entre as culturas. No <strong>pós-pico</strong>, a Silagem mantém mais densa (32,9%) que o Grão (9,2%), mas o Grão avança em veg. alta (52,9%) — indicando que o enchimento de grãos ainda mantém o dossel verde mesmo com o ciclo mais longo.
+      </div>
     </div>
+
 
     <!-- ANÁLISE 4.0 vs CONV -->
     <h2 style="margin-top:8px">Ag. Precisão 4.0 vs Convencional — Variabilidade</h2>
