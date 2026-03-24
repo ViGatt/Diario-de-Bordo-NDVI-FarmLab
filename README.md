@@ -1,4 +1,5 @@
 # 🛰️ Diário de Bordo — NDVI FarmLab
+# Acesso - https://vigatt.github.io/Diario-de-Bordo-NDVI-FarmLab/
 ### Monitoramento de Milho por Satélite · Safra 2025–2026
 
 > Projeto acadêmico de análise temporal de NDVI desenvolvido com dados fornecidos pela **Jacto / FarmLab**, utilizando imagens do satélite **Sentinel-2 (ESA)** processadas pela plataforma **One Soil**.

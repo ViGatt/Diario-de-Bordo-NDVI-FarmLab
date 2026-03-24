@@ -865,6 +865,9 @@
     <button class="tab-btn" onclick="switchTab('heterogeneidade', this)">
       <span class="tab-num">08</span>Heterogeneidade<span class="tab-new-badge">NOVO</span>
     </button>
+    <button class="tab-btn" onclick="switchTab('conclusoes', this)">
+      <span class="tab-num">09</span>Conclusões<span class="tab-new-badge">NOVO</span>
+    </button>
   </nav>
 </header>
 
@@ -1855,6 +1858,194 @@
     <div class="note-box">
       <strong>🔬 Interpretação Agronômica</strong>
       A <strong>Silagem 4.0</strong> atingiu <strong>82% de pixels com vegetação densa</strong> no pico — a maior cobertura registrada — com STD relativamente baixo (0,170), indicando alta uniformidade no vigor máximo. Isso sugere que o manejo por zonas nivelou o desempenho para cima. Nos <strong>talhões de Grão</strong>, a correlação positiva STD×NDVI revela zonas com ritmos de crescimento distintos — informação valiosa para definir <strong>zonas de manejo futuras</strong>. O <strong>STD elevado de novembro</strong> em todos os talhões corresponde ao período de estabelecimento heterogêneo — normal na emergência do milho, quando plantas em diferentes estágios coexistem no mesmo talhão.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 09 — CONCLUSÕES ═══════════════════════════ -->
+  <div id="tab-conclusoes" class="tab-panel">
+    <div class="section-label">// 09 — Síntese e Conclusões</div>
+    <h2>Inferências Finais — Safra 2025–2026</h2>
+    <p style="color:var(--muted);margin-bottom:28px">Consolidação de todas as análises realizadas: NDVI, clima, correlações e heterogeneidade espacial. Base para a apresentação acadêmica.</p>
+
+    <!-- MENSAGEM CENTRAL -->
+    <div style="background:linear-gradient(135deg,rgba(61,220,132,0.08),rgba(61,220,132,0.03));border:1px solid rgba(61,220,132,0.3);border-radius:12px;padding:28px;margin-bottom:28px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ndvi),transparent)"></div>
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">// Mensagem Central</div>
+      <p style="font-family:'Syne',sans-serif;font-size:17px;color:var(--white);line-height:1.6;margin:0">
+        O monitoramento por NDVI demonstrou ser uma ferramenta viável e informativa para acompanhamento da safra de milho — com crescimento adequado, pico fenológico identificado e correlação com eventos climáticos confirmada. As principais limitações foram a cobertura de nuvens em períodos críticos e a ausência de dados de produtividade para validação final. O <strong style="color:var(--ndvi)">paradoxo NDVI Convencional&nbsp;&gt;&nbsp;4.0</strong> abre a discussão mais relevante do projeto: <em>NDVI mede biomassa, não eficiência agronômica — e a agricultura de precisão joga em outra dimensão.</em>
+      </p>
+    </div>
+
+    <!-- VEREDICTOS POR TEMA -->
+    <h2>Veredictos por Tema</h2>
+    <div class="card-grid" style="margin-bottom:24px">
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌱</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Crescimento da Lavoura</span>
+          <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">BOM</span>
+        </div>
+        <p>Pico de NDVI em 16/jan/2026 com valores de <strong>0,839</strong> (Silagem 4.0) — cobertura densa em mais de 80% dos pixels. A curva fenológica seguiu o padrão esperado para milho tropical, com crescimento progressivo de novembro a janeiro.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌧️</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Qualidade dos Dados</span>
+          <span style="margin-left:auto;background:rgba(245,200,66,0.12);color:var(--yellow);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(245,200,66,0.25)">PARCIAL</span>
+        </div>
+        <p><strong>39,3% das imagens inutilizadas por nuvens</strong>. Outubro (plantio) e dezembro (chuvas extremas) foram os meses mais prejudicados. Janeiro compensou com 84% de aproveitamento e capturou o pico. A anomalia de 11/jan confirmou a necessidade de validação cruzada com dados climáticos.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌡️</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Influência Climática</span>
+          <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">MODERADA</span>
+        </div>
+        <p>O NDVI foi primariamente controlado pela <strong>fenologia</strong>, não pelo clima. A umidade relativa foi a variável com maior correlação positiva (r até +0,40). O déficit hídrico de janeiro (−45mm) coincidiu com o pico de NDVI — a lavoura absorveu o estresse sem colapso visível no satélite.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🔬</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Ag. Precisão 4.0</span>
+          <span style="margin-left:auto;background:rgba(245,147,66,0.15);color:var(--orange,#f59342);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(245,147,66,0.3)">EM ABERTO</span>
+        </div>
+        <p>O NDVI médio do Convencional supera o 4.0 nos talhões de grão — mas esse é o <strong>resultado esperado</strong> de um manejo que redistribui insumos por zona, não que maximiza a média. A prova definitiva virá com os <strong>mapas de yield em mai/2026</strong>.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">📐</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Heterogeneidade</span>
+          <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">INFORMATIVO</span>
+        </div>
+        <p>Silagem 4.0 com <strong>17,7% mais STD</strong> — confirmando diferenciação das zonas de manejo. Talhões de grão com correlação STD×NDVI positiva (+0,53) revelam zonas internas com ritmos distintos de crescimento: mapa pronto para futuras zonas de manejo.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌽</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Silagem vs. Grão</span>
+          <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">CLARO</span>
+        </div>
+        <p>Silagem consistentemente superior em biomassa: NDVI médio <strong>18% maior</strong>, 3× mais pixels densos no pico, menor solo exposto. Biologicamente esperado — cultivares de silagem priorizam massa total, não enchimento de grão.</p>
+      </div>
+
+    </div>
+
+    <!-- PONTOS FORTES E FRACOS -->
+    <div class="card-grid" style="margin-bottom:24px">
+      <div class="card">
+        <h3>✅ Pontos Fortes do Estudo</h3>
+        <table>
+          <tbody>
+            <tr><td style="color:var(--ndvi);font-size:18px;width:32px">+</td><td>Série temporal de 6 meses com 4 talhões simultâneos</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Cruzamento NDVI × dados climáticos horários (Metos Pro)</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Validação cruzada que identificou e explicou anomalias</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Análise de heterogeneidade espacial (b1_std e CV)</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Comparativo simultâneo Convencional vs. Ag. 4.0</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Pico fenológico capturado com condições ideais validadas</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>⚠️ Limitações e Pontos de Melhoria</h3>
+        <table>
+          <tbody>
+            <tr><td style="color:var(--red);font-size:18px;width:32px">−</td><td>39,3% de imagens perdidas por nuvens — outubro crítico</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Sem dados de solo para correlação com variabilidade interna</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Sem histórico de doses e zonas aplicadas no manejo 4.0</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Máscara de qualidade B2 falhou em nuvens parciais (11/jan)</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Yield ausente — impossível validar NDVI vs. produtividade real</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Diferença de cultivar entre talhões não controlada</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LINHA DO TEMPO DAS DESCOBERTAS -->
+    <h2>Linha do Tempo das Descobertas</h2>
+    <div class="timeline" style="margin-bottom:28px">
+
+      <div class="tl-item">
+        <div class="tl-date">Out–Nov 2025</div>
+        <div class="tl-title">📷 Dados escassos no período crítico</div>
+        <div class="tl-desc">Outubro teve 71% de imagens nubladas — o plantio e emergência do milho ficaram praticamente sem cobertura satelital. Novembro compensou com 75% de aproveitamento e revelou o início do crescimento diferenciado entre talhões.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Dez 2025</div>
+        <div class="tl-title">🌧️ Dezembro chuvoso = lacuna na série</div>
+        <div class="tl-desc">320mm de precipitação e evento de 129,4mm em um único dia (09/12) comprometeram 67% das imagens. Os dados do Metos foram essenciais para explicar essa lacuna e evitar interpretações erradas da série NDVI.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">11 Jan 2026</div>
+        <div class="tl-title">🚨 Anomalia detectada e explicada</div>
+        <div class="tl-desc">Queda abrupta para NDVI 0,25 nos talhões de grão com clima favorável — diagnóstico de contaminação por nuvem parcial não mascarada. Exemplo prático da importância da validação cruzada com dados meteorológicos.</div>
+      </div>
+
+      <div class="tl-item now">
+        <div class="tl-date">16 Jan 2026</div>
+        <div class="tl-title">🏆 Pico universal — melhor dia da safra</div>
+        <div class="tl-desc">Todos os 4 talhões atingiram seu máximo NDVI simultâneamente. Condições perfeitas confirmadas: umidade 89%, temperatura 23,5°C, precipitação acumulada moderada. Silagem 4.0 liderou com 0,839 e 82% de pixels densos.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Fev 2026</div>
+        <div class="tl-title">📉 Pós-pico e nova janela de nuvens</div>
+        <div class="tl-desc">NDVI começa a recuar em alguns talhões — sinal de início de senescência ou stress. Evento de 91mm em 08/02 comprometeu as imagens NDVI #2 planejadas. Último dado válido geral em 20/02/26.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Mai 2026</div>
+        <div class="tl-title">⏳ Yield — o dado que falta</div>
+        <div class="tl-desc">Colheita dos talhões de grão e geração dos mapas de produtividade. Esse dado fechará o ciclo e permitirá validar se o NDVI foi um bom preditor de produtividade — e se o manejo 4.0 entregou mais eficiência por área.</div>
+      </div>
+
+    </div>
+
+    <!-- PRÓXIMOS PASSOS -->
+    <h2>Próximos Passos do Projeto</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>Etapa</th><th>Quando</th><th>O que responderá</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Correlação NDVI × Yield</td>
+            <td class="mono">Mai/2026</td>
+            <td class="muted">NDVI foi bom preditor de produtividade real?</td>
+          </tr>
+          <tr>
+            <td>Comparativo 4.0 × Conv. no Yield</td>
+            <td class="mono">Mai/2026</td>
+            <td class="muted">O manejo de precisão entregou mais com menos insumo?</td>
+          </tr>
+          <tr>
+            <td>Mapa de zonas de vigor × Mapa de yield</td>
+            <td class="mono">Mai/2026</td>
+            <td class="muted">As zonas de alto STD coincidem com zonas de menor produtividade?</td>
+          </tr>
+          <tr>
+            <td>Análise de solo dos talhões</td>
+            <td class="mono">A definir</td>
+            <td class="muted">A variabilidade de NDVI tem origem pedológica?</td>
+          </tr>
+          <tr>
+            <td>Imagens de alta resolução (drone)</td>
+            <td class="mono">A definir</td>
+            <td class="muted">Confirmar falhas de stand em pixels de baixo NDVI?</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box">
+      <strong>🎓 Para a Apresentação Acadêmica</strong>
+      Os dados sustentam uma narrativa clara em três atos: <strong>(1) O satélite funcionou</strong> — a curva fenológica foi capturada, o pico identificado, eventos climáticos rastreados. <strong>(2) Os dados têm limitações reais</strong> — nuvens, anomalias e ausência de yield são lacunas honestas que demonstram maturidade metodológica. <strong>(3) A pergunta mais importante ainda não tem resposta</strong> — e isso é o que torna o projeto academicamente relevante. NDVI é biomassa. Produtividade é outra coisa. E a agricultura de precisão 4.0 opera nesse espaço entre os dois.
     </div>
   </div>
 
