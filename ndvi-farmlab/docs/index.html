@@ -1,0 +1,3231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diário de Bordo — NDVI FarmLab</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0f0d;
+    --surface:   #111814;
+    --card:      #161e19;
+    --border:    #1f2e24;
+    --ndvi:      #3ddc84;
+    --ndvi-dim:  #1e6b3e;
+    --ndvi-glow: rgba(61,220,132,0.12);
+    --yellow:    #f5c842;
+    --red:       #e05c5c;
+    --blue:      #5ca8e0;
+    --text:      #d4e8da;
+    --muted:     #6b8f77;
+    --white:     #f0faf4;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BACKGROUND GRID ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 0 48px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(10,15,13,0.98) 0%, rgba(10,15,13,0.92) 100%);
+    backdrop-filter: blur(8px);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: var(--ndvi);
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #0a0f0d;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--white);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .meta-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .meta-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ndvi);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .header-title-row {
+    padding: 24px 0 20px;
+  }
+
+  .project-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ndvi);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(26px, 4vw, 42px);
+    color: var(--white);
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  h1 span {
+    color: var(--ndvi);
+  }
+
+  .project-desc {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-style: italic;
+  }
+
+  /* ── NAV TABS ── */
+  nav {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 14px 20px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    position: relative;
+  }
+
+  .tab-btn:hover { color: var(--text); }
+
+  .tab-btn.active {
+    color: var(--ndvi);
+    border-bottom-color: var(--ndvi);
+  }
+
+  .tab-btn .tab-num {
+    font-size: 9px;
+    opacity: 0.5;
+    margin-right: 6px;
+  }
+
+  .tab-new-badge {
+    display: inline-block;
+    background: var(--ndvi);
+    color: #0a0f0d;
+    font-size: 8px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 6px;
+    vertical-align: middle;
+    animation: fadeIn 0.4s ease;
+  }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  .tab-panel { display: none; animation: fadeIn 0.35s ease; }
+  .tab-panel.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--ndvi);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--white);
+    letter-spacing: -0.5px;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  p { margin-bottom: 14px; color: var(--text); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--ndvi), transparent);
+    opacity: 0.5;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  /* ── STAT PILLS ── */
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .stat-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 130px;
+  }
+
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ndvi);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  thead th {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(31,46,36,0.6);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: rgba(61,220,132,0.04); }
+
+  tbody td {
+    padding: 10px 12px;
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  td.mono {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ndvi);
+  }
+
+  td.muted { color: var(--muted); font-size: 12px; }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--ndvi-dim), transparent);
+  }
+
+  .tl-item {
+    position: relative;
+    margin-bottom: 32px;
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -28px; top: 6px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--ndvi-dim);
+    border: 2px solid var(--bg);
+    transition: background 0.2s;
+  }
+
+  .tl-item.now::before {
+    background: var(--ndvi);
+    box-shadow: 0 0 0 4px rgba(61,220,132,0.15);
+  }
+
+  .tl-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ndvi);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .tl-item.now .tl-date::after {
+    content: ' ← AGORA';
+    color: var(--yellow);
+    font-size: 9px;
+  }
+
+  .tl-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .tl-desc { color: var(--muted); font-size: 13px; }
+
+  /* ── NDVI SCALE ── */
+  .ndvi-scale {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 20px 0;
+  }
+
+  .ndvi-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ndvi-color {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .ndvi-range {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ndvi);
+    width: 100px;
+    flex-shrink: 0;
+  }
+
+  .ndvi-name {
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .ndvi-current-tag {
+    background: var(--yellow);
+    color: #0a0f0d;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-left: 8px;
+  }
+
+  /* ── TALHÃO CARDS ── */
+  .talhao-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  .talhao-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .talhao-card:hover {
+    border-color: var(--ndvi-dim);
+    transform: translateY(-2px);
+  }
+
+  .talhao-id {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .talhao-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--white);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .talhao-tag {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .tag-silagem { background: rgba(92,168,224,0.15); color: var(--blue); border: 1px solid rgba(92,168,224,0.3); }
+  .tag-grao    { background: rgba(245,200,66,0.12); color: var(--yellow); border: 1px solid rgba(245,200,66,0.25); }
+  .tag-40      { background: rgba(61,220,132,0.1);  color: var(--ndvi);   border: 1px solid rgba(61,220,132,0.25); }
+  .tag-conv    { background: rgba(255,255,255,0.06); color: var(--muted);  border: 1px solid var(--border); }
+
+  .talhao-colheita {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* ── DATASET SCHEMA ── */
+  .band-section {
+    margin-bottom: 28px;
+  }
+
+  .band-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .band-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  .b1 { background: rgba(61,220,132,0.15); color: var(--ndvi); }
+  .b2 { background: rgba(92,168,224,0.15); color: var(--blue); }
+  .b3 { background: rgba(245,200,66,0.12); color: var(--yellow); }
+
+  /* ── QUOTE / NOTE BOX ── */
+  .note-box {
+    border-left: 3px solid var(--ndvi);
+    background: var(--ndvi-glow);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 20px 0;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .note-box strong {
+    color: var(--ndvi);
+  }
+
+  .note-box > strong:first-child {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 2;
+    border-top: 1px solid var(--border);
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer-left {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.8px;
+  }
+
+  .footer-right {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ndvi-dim);
+  }
+
+  /* ── DOWNLOAD / COMMIT PANEL ── */
+  .dev-bar {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .dev-toggle {
+    background: var(--ndvi);
+    color: #0a0f0d;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(61,220,132,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .dev-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(61,220,132,0.4);
+  }
+
+  .dev-panel {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    width: 320px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    animation: fadeIn 0.2s ease;
+  }
+
+  .dev-panel.open { display: block; }
+
+  .dev-panel-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--ndvi);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .dev-btn {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .btn-download {
+    background: rgba(61,220,132,0.1);
+    color: var(--ndvi);
+    border-color: rgba(61,220,132,0.3);
+  }
+
+  .btn-download:hover { background: rgba(61,220,132,0.18); border-color: var(--ndvi); }
+
+  .commit-section { margin-top: 12px; }
+
+  .commit-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .commit-input-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .commit-msg-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .commit-msg-input:focus { border-color: var(--ndvi-dim); }
+  .commit-msg-input::placeholder { color: var(--muted); }
+
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--ndvi);
+    white-space: pre;
+    overflow-x: auto;
+    margin-bottom: 6px;
+    line-height: 1.8;
+    position: relative;
+  }
+
+  .btn-copy {
+    background: rgba(92,168,224,0.1);
+    color: var(--blue);
+    border-color: rgba(92,168,224,0.25);
+    width: 100%;
+  }
+
+  .btn-copy:hover { background: rgba(92,168,224,0.18); border-color: var(--blue); }
+
+  .copy-feedback {
+    font-size: 10px;
+    color: var(--ndvi);
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+    height: 14px;
+    transition: opacity 0.3s;
+    opacity: 0;
+  }
+
+  .copy-feedback.show { opacity: 1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 680px) {
+    header { padding: 0 20px; }
+    main { padding: 32px 20px 60px; }
+    footer { padding: 16px 20px; }
+    .header-meta { display: none; }
+    .stats-row { flex-direction: column; }
+    .stat-pill { min-width: unset; }
+  }
+
+  /* ── CODE INLINE ── */
+  code {
+    display: inline;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    background: rgba(61,220,132,0.1);
+    color: var(--ndvi);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(61,220,132,0.2);
+    white-space: nowrap;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+
+  /* ── FILE BADGES ── */
+  .file-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .file-icon {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .ext-tiff { background: rgba(61,220,132,0.15); color: var(--ndvi); }
+  .ext-jpg  { background: rgba(92,168,224,0.15); color: var(--blue); }
+  .ext-csv  { background: rgba(245,200,66,0.12); color: var(--yellow); }
+  .ext-parq { background: rgba(224,92,92,0.15);  color: var(--red); }
+
+  .file-name { color: var(--white); font-family: 'Space Mono', monospace; font-size: 11px; }
+  .file-desc { color: var(--muted); font-size: 12px; margin-left: auto; }
+  /* ── CAROUSEL STYLES ── */
+.carousel-container {
+  position: relative;
+  width: 100%;
+  margin: 20px 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  padding: 10px;
+}
+
+/* Customização dos Cards dentro do Carrossel */
+.carousel-slide .card {
+  margin-bottom: 0;
+  background: transparent;
+  border: none;
+}
+
+.carousel-slide .card::before { display: none; }
+
+.carousel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 16px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+.carousel-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ndvi);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.carousel-btn:hover {
+  background: var(--ndvi);
+  color: var(--bg);
+  border-color: var(--ndvi);
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.dot.active {
+  background: var(--ndvi);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ── MODAL STYLES (Versão Corrigida) ── */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 2000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(10, 15, 13, 0.98);
+  backdrop-filter: blur(10px);
+  cursor: zoom-out;
+  /* Centralização Flexbox */
+  display: none; /* Alterado dinamicamente pelo JS */
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  margin: auto;
+  display: block;
+  max-width: 95%;      /* Ocupa quase toda a largura se necessário */
+  max-height: 85vh;    /* CHAVE: Limita a altura a 85% da altura da tela */
+  width: auto;         /* Mantém a proporção correta */
+  height: auto;
+  object-fit: contain; /* Garante que a imagem não seja cortada */
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 0 50px rgba(61, 220, 132, 0.2);
+  animation: zoomIn 0.3s ease-out;
+}
+
+@keyframes zoomIn {
+  from {transform: scale(0.7); opacity: 0}
+  to {transform: scale(1); opacity: 1}
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px; right: 35px;
+  color: var(--ndvi);
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.modal-close:hover { transform: scale(1.1); }
+
+/* Cursor de lupa para indicar que a imagem é clicável */
+.carousel-slide img, .card img {
+  cursor: zoom-in;
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo-area">
+      <div class="logo-icon">🛰</div>
+      <div>
+        <div class="logo-text">FarmLab NDVI</div>
+        <div class="logo-sub">Diário de Bordo · Safra 2025–2026</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-badge"><span class="dot"></span>Monitoramento Ativo</div>
+      <div class="meta-badge">Sentinel-2 · 10 m/px</div>
+      <div class="meta-badge">4 Talhões · 49 Datas</div>
+    </div>
+  </div>
+
+  <div class="header-title-row">
+    <div class="project-label">// Projeto Acadêmico — Tratativa de NDVI</div>
+    <h1>Monitoramento de<br><span>Milho por Satélite</span></h1>
+    <p class="project-desc">Análise temporal de NDVI via Sentinel-2 · Parceria Jacto / One Soil · EPSG:31982</p>
+  </div>
+
+  <nav id="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('contexto', this)">
+      <span class="tab-num">01</span>Contexto
+    </button>
+    <button class="tab-btn" onclick="switchTab('timeline', this)">
+      <span class="tab-num">02</span>Timeline
+    </button>
+    <button class="tab-btn" onclick="switchTab('dataset', this)">
+      <span class="tab-num">03</span>Dataset
+    </button>
+    <button class="tab-btn" onclick="switchTab('talhoes', this)">
+      <span class="tab-num">04</span>Talhões
+    </button>
+    <button class="tab-btn" onclick="switchTab('clima', this)">
+      <span class="tab-num">05</span>Clima<span class="tab-new-badge">NOVO</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('ndvi', this)">
+      <span class="tab-num">06</span>NDVI<span class="tab-new-badge">NOVO</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('correlacao', this)">
+      <span class="tab-num">07</span>Correlação<span class="tab-new-badge">NOVO</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('heterogeneidade', this)">
+      <span class="tab-num">08</span>Heterogeneidade<span class="tab-new-badge">NOVO</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('conclusoes', this)">
+      <span class="tab-num">09</span>Conclusões<span class="tab-new-badge">NOVO</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('gapfilling', this)">
+      <span class="tab-num">10</span>Gap-Filling<span class="tab-new-badge">NOVO</span>
+    </button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ═══════════════════════════ TAB 01 — CONTEXTO ═══════════════════════════ -->
+  <div id="tab-contexto" class="tab-panel active">
+    <div class="section-label">// 01 — Contexto do Projeto</div>
+    <h2>Visão Geral</h2>
+
+    <div class="stats-row">
+      <div class="stat-pill">
+        <span class="stat-value">4</span>
+        <span class="stat-label">Talhões monitorados</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">49</span>
+        <span class="stat-label">Datas de imageamento</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">196</span>
+        <span class="stat-label">Imagens GeoTIFF</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">10m</span>
+        <span class="stat-label">Resolução espacial</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">75</span>
+        <span class="stat-label">Colunas no CSV</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Sobre o Projeto</h3>
+      <p>
+        Este diário de bordo documenta o projeto acadêmico de <strong>tratativa de NDVI</strong> desenvolvido com dados fornecidos pela <strong>Jacto / FarmLab</strong>. O objetivo é analisar a evolução temporal da vegetação em quatro talhões de milho durante a safra 2025–2026, utilizando imagens de satélite do <strong>Sentinel-2 (ESA)</strong> processadas pela plataforma <strong>One Soil</strong>.
+      </p>
+      <p>
+        O NDVI (Normalized Difference Vegetation Index) é um índice espectral que mede a densidade e saúde da vegetação a partir da reflectância no infravermelho próximo e no vermelho. Varia de <strong>−1 a +1</strong>, onde valores maiores indicam cobertura vegetal mais densa e saudável.
+      </p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>🌽 Cultura Monitorada</h3>
+        <p><strong>Milho (Zea mays)</strong> — Safra safrinha 2025–2026. Dois sistemas de produção avaliados em paralelo: <em>Convencional</em> e <em>4.0</em> (agricultura de precisão com zonas de manejo).</p>
+        <p>Estágio atual: <strong>Vegetação Baixa</strong> (NDVI ~0.2–0.4), correspondente ao período pós-florescimento / início de enchimento de grãos.</p>
+      </div>
+      <div class="card">
+        <h3>🛰️ Fonte dos Dados</h3>
+        <p>Imagens derivadas do <strong>Sentinel-2</strong> com resolução de 10 m/pixel, projeção <strong>SIRGAS 2000 / UTM fuso 22S (EPSG:31982)</strong>.</p>
+        <p>Plataforma de análise: <strong>One Soil</strong>. Dados fornecidos em GeoTIFF (3 bandas: NDVI, Qualidade, Máscara talhão).</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📊 Escala NDVI — Interpretação Agronômica</h3>
+      <div class="ndvi-scale">
+        <div class="ndvi-bar">
+          <div class="ndvi-color" style="background:#2c4ea0"></div>
+          <span class="ndvi-range">&lt; 0.0</span>
+          <span class="ndvi-name">Água / sombra / superfícies não vegetadas</span>
+        </div>
+        <div class="ndvi-bar">
+          <div class="ndvi-color" style="background:#8b7355"></div>
+          <span class="ndvi-range">0.0 – 0.2</span>
+          <span class="ndvi-name">Solo exposto — esperado no plantio (Out 2025)</span>
+        </div>
+        <div class="ndvi-bar">
+          <div class="ndvi-color" style="background:#8db87a"></div>
+          <span class="ndvi-range">0.2 – 0.4</span>
+          <span class="ndvi-name">Vegetação baixa / inicial
+            <span class="ndvi-current-tag">ESTÁGIO ATUAL</span>
+          </span>
+        </div>
+        <div class="ndvi-bar">
+          <div class="ndvi-color" style="background:#4d9e5e"></div>
+          <span class="ndvi-range">0.4 – 0.6</span>
+          <span class="ndvi-name">Vegetação moderada em desenvolvimento</span>
+        </div>
+        <div class="ndvi-bar">
+          <div class="ndvi-color" style="background:#2a7a3c"></div>
+          <span class="ndvi-range">0.6 – 0.8</span>
+          <span class="ndvi-name">Vegetação bem desenvolvida (pico esperado)</span>
+        </div>
+        <div class="ndvi-bar">
+          <div class="ndvi-color" style="background:#1a5e2a"></div>
+          <span class="ndvi-range">&gt; 0.8</span>
+          <span class="ndvi-name">Cobertura vegetal máxima / dossel denso</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>📌 Nota Metodológica</strong>
+      Imagens com <code>b1_valid_pixels = 0</code> indicam cobertura total por nuvens — devem ser excluídas da análise temporal. O desvio padrão do NDVI (<code>b1_std</code>) é um indicador de heterogeneidade espacial dentro do talhão: valores altos podem revelar falhas de stand, compactação localizada ou variabilidade de fertilidade.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 02 — TIMELINE ═══════════════════════════ -->
+  <div id="tab-timeline" class="tab-panel">
+    <div class="section-label">// 02 — Timeline da Safra</div>
+    <h2>Principais Eventos Agrícolas</h2>
+    <p style="margin-bottom:32px; color:var(--muted);">Eventos mapeados com coletas de dados associadas. Safra safrinha 2025–2026.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-date">Out 2025</div>
+        <div class="tl-title">🌱 Plantio do Milho (safrinha)</div>
+        <div class="tl-desc">Semeadura nos quatro talhões. NDVI esperado próximo a zero — solo exposto dominante. Início do monitoramento por satélite.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Nov 2025</div>
+        <div class="tl-title">🧪 Adubação de Base</div>
+        <div class="tl-desc">Aplicação de fertilizantes para suporte ao desenvolvimento inicial das plantas. Emergência e estádios vegetativos precoces (V1–V4).</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Dez 2025</div>
+        <div class="tl-title">🛡️ 1ª Aplicação de Defensivos</div>
+        <div class="tl-desc">Controle fitossanitário. Possível leve queda no NDVI imediatamente após a aplicação, retomando crescimento em seguida.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Jan 2026</div>
+        <div class="tl-title">🛰️ 2ª Aplicação de Defensivos + Imagens NDVI #1</div>
+        <div class="tl-desc">Segunda rodada de defensivos. Primeira coleta de imagens NDVI destacada — referência para análise comparativa inter-talhões.</div>
+      </div>
+
+      <div class="tl-item now">
+        <div class="tl-date">Fev 2026</div>
+        <div class="tl-title">🌸 Florescimento + Imagens NDVI #2</div>
+        <div class="tl-desc">Fase de florescimento / pendoamento. Segunda coleta NDVI de referência. Espera-se que os talhões de silagem já mostrem diferenciação em relação aos de grão. NDVI ~0.2–0.4 (vegetação baixa).</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Mar 2026</div>
+        <div class="tl-title">🌾 Enchimento de Grãos</div>
+        <div class="tl-desc">Fase crítica de acúmulo de biomassa nos grãos. NDVI pode se estabilizar ou iniciar leve declínio conforme senescência das folhas basais começa.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Mai 2026</div>
+        <div class="tl-title">🏁 Colheita + Geração de Mapas de Produtividade (Yield)</div>
+        <div class="tl-desc">Colheita dos talhões de grão. Geração de mapas yield para correlação com os dados de NDVI coletados ao longo da safra. Talhões de silagem já colhidos anteriormente (~Mar/Abr).</div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>🔍 Diferença Silagem vs. Grão</strong>
+      Os talhões destinados à silagem (<strong>0bf86c8b</strong> e <strong>f791bf13</strong>) serão colhidos em planta inteira cerca de 2 meses antes dos talhões de grão. Isso deve gerar curvas NDVI com <strong>pico mais cedo e queda mais abrupta</strong> — um sinal temporal detectável na série histórica de imagens.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 03 — DATASET ═══════════════════════════ -->
+  <div id="tab-dataset" class="tab-panel">
+    <div class="section-label">// 03 — Estrutura do Dataset</div>
+    <h2>Arquivos Disponíveis</h2>
+
+    <div class="file-list" style="margin-bottom:28px">
+      <div class="file-item">
+        <span class="file-icon ext-tiff">TIFF</span>
+        <span class="file-name">ndvi/ &nbsp;→&nbsp; ndvi_raw_{season_id}_{data}.tiff</span>
+        <span class="file-desc">196 imagens · 3 bandas · 54×40 px · EPSG:3857</span>
+      </div>
+      <div class="file-item">
+        <span class="file-icon ext-jpg">JPG</span>
+        <span class="file-name">images/ &nbsp;→&nbsp; ndvi_raw_{season_id}_{data}.jpg</span>
+        <span class="file-desc">196 previews RGB para visualização</span>
+      </div>
+      <div class="file-item">
+        <span class="file-icon ext-csv">CSV</span>
+        <span class="file-name">ndvi_metadata.csv</span>
+        <span class="file-desc">196 registros · 75 colunas · estatísticas raster</span>
+      </div>
+      <div class="file-item">
+        <span class="file-icon ext-parq">PARQ</span>
+        <span class="file-name">ndvi_metadata.parquet</span>
+        <span class="file-desc">Mesma estrutura do CSV em formato binário otimizado</span>
+      </div>
+    </div>
+
+    <h2>Schema — Bandas do GeoTIFF</h2>
+
+    <div class="band-section">
+      <div class="band-header">
+        <span class="band-pill b1">B1 — NDVI</span>
+        <span style="color:var(--muted);font-size:13px">Índice de vegetação por pixel (−1 a 1)</span>
+      </div>
+      <table>
+        <thead><tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">b1_mean</td><td class="muted">float64</td><td>NDVI médio — indicador geral de saúde vegetal</td></tr>
+          <tr><td class="mono">b1_median</td><td class="muted">float64</td><td>Mediana — menos sensível a outliers</td></tr>
+          <tr><td class="mono">b1_std</td><td class="muted">float64</td><td>Desvio padrão — heterogeneidade espacial do talhão</td></tr>
+          <tr><td class="mono">b1_valid_pixels</td><td class="muted">int</td><td>Pixels válidos. 0 = imagem totalmente nublada</td></tr>
+          <tr><td class="mono">b1_pct_solo</td><td class="muted">float64</td><td>% solo exposto (NDVI 0–0.2)</td></tr>
+          <tr><td class="mono">b1_pct_veg_baixa</td><td class="muted">float64</td><td>% vegetação baixa/inicial (NDVI 0.2–0.4)</td></tr>
+          <tr><td class="mono">b1_pct_veg_mod</td><td class="muted">float64</td><td>% vegetação moderada (NDVI 0.4–0.6)</td></tr>
+          <tr><td class="mono">b1_pct_veg_alta</td><td class="muted">float64</td><td>% vegetação alta (NDVI 0.6–0.8)</td></tr>
+          <tr><td class="mono">b1_pct_veg_densa</td><td class="muted">float64</td><td>% cobertura máxima (NDVI > 0.8)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="band-section">
+      <div class="band-header">
+        <span class="band-pill b2">B2 — Qualidade</span>
+        <span style="color:var(--muted);font-size:13px">Máscara de confiança do pixel (0 = válido)</span>
+      </div>
+      <table>
+        <thead><tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">b2_mean</td><td class="muted">float64</td><td>Média da máscara — indica qualidade geral da imagem</td></tr>
+          <tr><td class="mono">b2_min</td><td class="muted">float64</td><td>Mínimo (0 = ao menos um pixel válido)</td></tr>
+          <tr><td class="mono">b2_max</td><td class="muted">float64</td><td>Máximo da máscara de qualidade</td></tr>
+          <tr><td class="mono">b2_valid_pixels</td><td class="muted">int</td><td>Pixels com valor válido na banda de qualidade</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="band-section">
+      <div class="band-header">
+        <span class="band-pill b3">B3 — Máscara Talhão</span>
+        <span style="color:var(--muted);font-size:13px">Delimitação estática do polígono agrícola (0/1)</span>
+      </div>
+      <table>
+        <thead><tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">b3_count_veg_densa</td><td class="muted">int</td><td>Pixels internos ao talhão (valor 1) — área monitorada</td></tr>
+          <tr><td class="mono">b3_pct_veg_densa</td><td class="muted">float64</td><td>% da área interna do talhão</td></tr>
+          <tr><td class="mono">b3_mean</td><td class="muted">float64</td><td>Proporção média da área coberta — fixo por talhão</td></tr>
+          <tr><td class="mono">b3_std</td><td class="muted">float64</td><td>Desvio padrão — indica heterogeneidade nas bordas</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box">
+      <strong>⚠️ Atenção ao Filtro de Qualidade</strong>
+      Antes de qualquer análise temporal, é necessário filtrar registros com <code>b1_valid_pixels = 0</code> (imagens nubladas). A coluna <code>nodata</code> do arquivo também auxilia nessa triagem. Imagens sem nodata declarado mas com pixels todos ausentes devem ser identificadas via <code>b1_valid_pixels</code>.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 04 — TALHÕES ═══════════════════════════ -->
+  <div id="tab-talhoes" class="tab-panel">
+    <div class="section-label">// 04 — Identificação dos Talhões</div>
+    <h2>Os 4 Talhões Monitorados</h2>
+    <p style="margin-bottom:8px; color:var(--muted);">Cada talhão é identificado por um UUID único que aparece nos nomes dos arquivos TIFF e nas colunas do CSV.</p>
+
+    <div class="talhao-grid">
+      <div class="talhao-card">
+        <div class="talhao-id">0bf86c8b</div>
+        <div class="talhao-name">Silagem Convencional</div>
+        <span class="talhao-tag tag-silagem">Silagem</span>
+        <span class="talhao-tag tag-conv">Convencional</span>
+        <div class="talhao-colheita">⏱ Colheita prevista: ~2 meses</div>
+      </div>
+      <div class="talhao-card">
+        <div class="talhao-id">258e47e0</div>
+        <div class="talhao-name">Grão 4.0</div>
+        <span class="talhao-tag tag-grao">Grão</span>
+        <span class="talhao-tag tag-40">Ag. Precisão 4.0</span>
+        <div class="talhao-colheita">⏱ Colheita prevista: Mai 2026</div>
+      </div>
+      <div class="talhao-card">
+        <div class="talhao-id">b7292cb8</div>
+        <div class="talhao-name">Grão Convencional</div>
+        <span class="talhao-tag tag-grao">Grão</span>
+        <span class="talhao-tag tag-conv">Convencional</span>
+        <div class="talhao-colheita">⏱ Colheita prevista: Mai 2026</div>
+      </div>
+      <div class="talhao-card">
+        <div class="talhao-id">f791bf13</div>
+        <div class="talhao-name">Silagem 4.0</div>
+        <span class="talhao-tag tag-silagem">Silagem</span>
+        <span class="talhao-tag tag-40">Ag. Precisão 4.0</span>
+        <div class="talhao-colheita">⏱ Colheita prevista: ~2 meses</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <h2>Comparativo de Sistemas</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>🔬 Agricultura 4.0</h3>
+        <p>Manejo por <strong>zonas de produtividade</strong> — a área é segmentada em zonas com diferentes potenciais produtivos, recebendo insumos de forma variável. Espera-se maior homogeneidade de NDVI dentro do talhão (<code>b1_std</code> menor) e potencialmente valores médios mais altos.</p>
+      </div>
+      <div class="card">
+        <h3>🌿 Convencional</h3>
+        <p>Manejo uniforme — aplicações iguais em toda a área do talhão. Pode apresentar maior variabilidade espacial de NDVI, refletindo heterogeneidade natural de solo não compensada pelo manejo.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📐 Dimensões das Imagens</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Parâmetro</th><th>Valor</th><th>Observação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Dimensão</td><td class="mono">54 × 40 px</td><td class="muted">Por imagem GeoTIFF</td></tr>
+          <tr><td>Resolução X</td><td class="mono">~10.7 m/px</td><td class="muted">EPSG:3857</td></tr>
+          <tr><td>Resolução Y</td><td class="mono">~10.8 m/px</td><td class="muted">EPSG:3857</td></tr>
+          <tr><td>Área imageada</td><td class="mono">~23.3 ha</td><td class="muted">Bounding box total por talhão</td></tr>
+          <tr><td>Bandas</td><td class="mono">3</td><td class="muted">NDVI · Qualidade · Máscara talhão</td></tr>
+          <tr><td>Projeção original</td><td class="mono">EPSG:31982</td><td class="muted">SIRGAS 2000 / UTM fuso 22S</td></tr>
+          <tr><td>Projeção arquivo</td><td class="mono">EPSG:3857</td><td class="muted">Web Mercator (GTiff)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 05 — CLIMA ═══════════════════════════ -->
+  <div id="tab-clima" class="tab-panel">
+    <div class="section-label">// 05 — Dados Meteorológicos</div>
+    <h2>Estação Metos Pro — Unimar Pesquisa</h2>
+
+    <div class="stats-row">
+      <div class="stat-pill">
+        <span class="stat-value">2.785</span>
+        <span class="stat-label">Registros horários</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">748 mm</span>
+        <span class="stat-label">Precipitação total</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">24,1°C</span>
+        <span class="stat-label">Temp. média geral</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">35,9°C</span>
+        <span class="stat-label">Pico de temperatura</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">129,4 mm</span>
+        <span class="stat-label">Maior evento (09/Dez)</span>
+      </div>
+    </div>
+
+    <!-- CHART 1: Precipitação diária -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b1">Precipitação Diária</span>
+        <span style="color:var(--muted);font-size:13px">Nov/2025 – Fev/2026 · mm/dia</span>
+      </div>
+      <canvas id="chartPrec" height="110"></canvas>
+    </div>
+
+    <!-- CHART 2: Temperatura -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b2">Temperatura Diária</span>
+        <span style="color:var(--muted);font-size:13px">Mín / Média / Máx · °C</span>
+      </div>
+      <canvas id="chartTemp" height="110"></canvas>
+    </div>
+
+    <!-- CHART 3: Radiação e Umidade -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b3">Radiação Solar &amp; Umidade Relativa</span>
+        <span style="color:var(--muted);font-size:13px">W/m² e %</span>
+      </div>
+      <canvas id="chartRadUmid" height="110"></canvas>
+    </div>
+
+    <!-- BALANÇO HÍDRICO MENSAL -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b1">Balanço Hídrico Mensal</span>
+        <span style="color:var(--muted);font-size:13px">Precipitação vs. Evapotranspiração · mm</span>
+      </div>
+      <canvas id="chartBalanco" height="120"></canvas>
+    </div>
+
+    <!-- TABELA RESUMO MENSAL -->
+    <h2 style="margin-top:8px">Resumo Mensal</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Mês</th>
+            <th>Prec. (mm)</th>
+            <th>Dias c/ chuva</th>
+            <th>T. Mín (°C)</th>
+            <th>T. Méd (°C)</th>
+            <th>T. Máx (°C)</th>
+            <th>ETo (mm)</th>
+            <th>Balanço</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">Nov/2025</td>
+            <td>102,2</td><td>12</td>
+            <td>13,6</td><td>22,9</td><td>35,0</td>
+            <td>139,0</td>
+            <td style="color:var(--red)">−36,8</td>
+          </tr>
+          <tr>
+            <td class="mono">Dez/2025</td>
+            <td>320,2</td><td>13</td>
+            <td>15,6</td><td>25,2</td><td>35,9</td>
+            <td>140,3</td>
+            <td style="color:var(--ndvi)">+179,9</td>
+          </tr>
+          <tr>
+            <td class="mono">Jan/2026</td>
+            <td>102,4</td><td>15</td>
+            <td>15,4</td><td>23,9</td><td>33,5</td>
+            <td>147,7</td>
+            <td style="color:var(--red)">−45,3</td>
+          </tr>
+          <tr>
+            <td class="mono">Fev/2026</td>
+            <td>223,4</td><td>17</td>
+            <td>17,4</td><td>24,6</td><td>34,5</td>
+            <td>94,4</td>
+            <td style="color:var(--ndvi)">+129,0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TOP EVENTOS -->
+    <div class="card-grid">
+      <div class="card">
+        <h3>🌧️ Top 5 Eventos de Chuva</h3>
+        <table>
+          <thead><tr><th>Data</th><th>Precipitação</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">09/Dez/2025</td><td style="color:var(--red);font-weight:700">129,4 mm</td></tr>
+            <tr><td class="mono">08/Fev/2026</td><td style="color:var(--red)">91,4 mm</td></tr>
+            <tr><td class="mono">14/Dez/2025</td><td>77,0 mm</td></tr>
+            <tr><td class="mono">13/Dez/2025</td><td>53,4 mm</td></tr>
+            <tr><td class="mono">01/Jan/2026</td><td>29,2 mm</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>🔥 Picos Térmicos</h3>
+        <table>
+          <thead><tr><th>Mês</th><th>Máx. Absoluta</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">Nov/2025</td><td>35,0°C</td></tr>
+            <tr><td class="mono">Dez/2025</td><td style="color:var(--red);font-weight:700">35,9°C</td></tr>
+            <tr><td class="mono">Jan/2026</td><td>33,5°C</td></tr>
+            <tr><td class="mono">Fev/2026</td><td>34,5°C</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>🔗 Impacto no NDVI</strong>
+      Dezembro registrou 320 mm de chuva com evento de 129,4 mm em um único dia (09/12) — espere alto número de imagens nubladas (<code>b1_valid_pixels = 0</code>) nesse período.
+      Janeiro apresentou déficit hídrico de 45,3 mm durante o florescimento — fase crítica do milho. Possível stress hídrico detectável na curva NDVI.
+      Os eventos de chuva intensa de Fevereiro (91,4 mm em 08/02) podem ter comprometido a qualidade das Imagens NDVI #2.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 06 — NDVI ═══════════════════════════ -->
+  <div id="tab-ndvi" class="tab-panel">
+    <div class="section-label">// 06 — Análise NDVI</div>
+    <h2>Série Temporal · 4 Talhões · Safra 2025–2026</h2>
+
+    <div class="stats-row">
+      <div class="stat-pill">
+        <span class="stat-value">196</span>
+        <span class="stat-label">Imagens totais</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">119</span>
+        <span class="stat-label">Imagens válidas</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value" style="color:var(--red)">77</span>
+        <span class="stat-label">Nubladas (39,3%)</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">0,839</span>
+        <span class="stat-label">Pico NDVI (Sil. 4.0)</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">16/Jan</span>
+        <span class="stat-label">Data do pico (todos)</span>
+      </div>
+    </div>
+
+    <!-- CHART 1: Série temporal comparativa (datas comuns) -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:4px">
+        <span class="band-pill b1">Curva Fenológica — 4 Talhões</span>
+        <span style="color:var(--muted);font-size:13px">NDVI médio · datas comuns válidas</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">28 datas em que todos os talhões possuíam imagem válida simultaneamente. Gaps = imagens nubladas.</p>
+      <canvas id="chartNdviSerie" height="120"></canvas>
+    </div>
+
+    <!-- CHART 2: Série individual Silagem -->
+    <div class="card-grid">
+      <div class="card">
+        <div class="band-header" style="margin-bottom:12px">
+          <span class="band-pill b2">Silagem Conv. vs 4.0</span>
+        </div>
+        <canvas id="chartNdviSilagem" height="160"></canvas>
+      </div>
+      <div class="card">
+        <div class="band-header" style="margin-bottom:12px">
+          <span class="band-pill b3">Grão Conv. vs 4.0</span>
+        </div>
+        <canvas id="chartNdviGrao" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- CHART 3: Classes de cobertura -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b1">Classes de Cobertura Vegetal</span>
+        <span style="color:var(--muted);font-size:13px">Distribuição média por talhão (% pixels) · imagens válidas</span>
+      </div>
+      <canvas id="chartCobertura" height="100"></canvas>
+    </div>
+
+    <!-- CHART 4: Heterogeneidade b1_std -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:16px">
+        <span class="band-pill b2">Heterogeneidade Espacial — b1_std</span>
+        <span style="color:var(--muted);font-size:13px">Desvio padrão do NDVI ao longo do tempo por talhão</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Valores altos indicam maior variabilidade interna — zonas de diferente vigor dentro do talhão.</p>
+      <canvas id="chartStd" height="110"></canvas>
+    </div>
+
+    <!-- COBERTURA POR MÊS -->
+    <h2>Qualidade das Imagens por Mês</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Mês</th><th>Nubladas</th><th>Válidas</th><th>Aproveitamento</th><th>Contexto</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">Ago/2025</td><td>12</td><td>20</td><td>62,5%</td><td class="muted">Pré-plantio — cultura anterior</td></tr>
+          <tr><td class="mono">Set/2025</td><td>4</td><td>24</td><td style="color:var(--ndvi)">85,7%</td><td class="muted">✅ Melhor mês</td></tr>
+          <tr><td class="mono">Out/2025</td><td>20</td><td>8</td><td style="color:var(--red)">28,6%</td><td class="muted">🚨 Plantio sem cobertura</td></tr>
+          <tr><td class="mono">Nov/2025</td><td>8</td><td>24</td><td style="color:var(--ndvi)">75,0%</td><td class="muted">✅ Estabelecimento visível</td></tr>
+          <tr><td class="mono">Dez/2025</td><td>16</td><td>8</td><td style="color:var(--red)">33,3%</td><td class="muted">🚨 320mm chuva (Metos)</td></tr>
+          <tr><td class="mono">Jan/2026</td><td>5</td><td>27</td><td style="color:var(--ndvi)">84,4%</td><td class="muted">✅ Pico NDVI captado</td></tr>
+          <tr><td class="mono">Fev/2026</td><td>12</td><td>8</td><td style="color:var(--yellow)">40,0%</td><td class="muted">⚠️ Evento 91mm em 08/02</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ACHADOS E ANOMALIAS -->
+    <div class="card-grid">
+      <div class="card">
+        <h3>🏆 Ranking — Pico NDVI (16/Jan)</h3>
+        <table>
+          <thead><tr><th>Talhão</th><th>NDVI Pico</th></tr></thead>
+          <tbody>
+            <tr><td>Silagem 4.0</td><td style="color:var(--ndvi);font-weight:700">0,839</td></tr>
+            <tr><td>Silagem Conv.</td><td style="color:var(--ndvi)">0,827</td></tr>
+            <tr><td>Grão Conv.</td><td>0,762</td></tr>
+            <tr><td>Grão 4.0</td><td>0,755</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>📊 NDVI Médio da Safra</h3>
+        <table>
+          <thead><tr><th>Talhão</th><th>Média</th><th>Std</th></tr></thead>
+          <tbody>
+            <tr><td>Silagem 4.0</td><td style="color:var(--ndvi);font-weight:700">0,516</td><td class="muted">0,186</td></tr>
+            <tr><td>Silagem Conv.</td><td style="color:var(--ndvi)">0,499</td><td class="muted">0,158</td></tr>
+            <tr><td>Grão Conv.</td><td>0,438</td><td class="muted">0,143</td></tr>
+            <tr><td>Grão 4.0</td><td>0,413</td><td class="muted">0,144</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>⚠️ Anomalia detectada — 11/Jan/2026</strong>
+      Grão Conv. despenca para <code>0,2496</code> e Grão 4.0 para <code>0,2874</code> em pleno crescimento — enquanto os talhões de Silagem mantêm valores normais (~0,44). Provável contaminação por nuvem parcial não detectada pela máscara de qualidade (B2). Esse ponto deve ser tratado como outlier na análise correlacional.
+    </div>
+
+    <div class="note-box">
+      <strong>🤔 Paradoxo Convencional &gt; 4.0</strong>
+      Em ambas as culturas, o manejo <strong>Convencional supera o 4.0</strong> em NDVI médio (Grão Conv. 0,438 vs Grão 4.0 0,413). Isso contraria a expectativa inicial. Possíveis explicações: diferença de variedade entre talhões, posição geográfica com fertilidade natural diferente, ou o benefício do manejo 4.0 se concentrar na eficiência de insumos — não necessariamente em maior NDVI médio. <strong>A confirmação virá com os mapas de yield em Mai/2026.</strong>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 07 — CORRELAÇÃO ═══════════════════════════ -->
+  <div id="tab-correlacao" class="tab-panel">
+    <div class="section-label">// 07 — Correlação NDVI × Clima</div>
+    <h2>NDVI vs. Variáveis Meteorológicas</h2>
+    <p style="color:var(--muted);margin-bottom:24px">Cruzamento da série NDVI de cada talhão com os dados horários da estação Metos Pro. Apenas imagens com <code>b1_valid_pixels &gt; 0</code> foram utilizadas.</p>
+
+    <!-- TABELA DE CORRELAÇÕES -->
+    <div class="card" style="margin-bottom:24px">
+      <h3>Matriz de Correlação de Pearson (r)</h3>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Correlação entre NDVI médio de cada talhão e variáveis climáticas na data da imagem. Valores entre −1 e +1.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Variável</th>
+            <th>Silagem 4.0</th>
+            <th>Silagem Conv.</th>
+            <th>Grão 4.0</th>
+            <th>Grão Conv.</th>
+            <th>Interpretação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">Umidade Rel. (%)</td>
+            <td style="color:var(--ndvi)">+0,273</td>
+            <td style="color:var(--ndvi)">+0,363</td>
+            <td style="color:var(--ndvi)">+0,398</td>
+            <td style="color:var(--ndvi)">+0,342</td>
+            <td class="muted">✅ Maior correlação positiva — dias úmidos = maior vegetação</td>
+          </tr>
+          <tr>
+            <td class="mono">Prec. do dia (mm)</td>
+            <td style="color:var(--ndvi)">+0,173</td>
+            <td style="color:var(--ndvi)">+0,195</td>
+            <td style="color:var(--ndvi)">+0,227</td>
+            <td style="color:var(--ndvi)">+0,207</td>
+            <td class="muted">Leve positiva — chuva recente associada a crescimento</td>
+          </tr>
+          <tr>
+            <td class="mono">Prec. acum. 7 dias</td>
+            <td style="color:var(--red)">−0,174</td>
+            <td style="color:var(--red)">−0,189</td>
+            <td style="color:var(--red)">−0,069</td>
+            <td style="color:var(--red)">−0,191</td>
+            <td class="muted">Negativa — excesso de chuva acumulada prejudica (ou gera nuvens)</td>
+          </tr>
+          <tr>
+            <td class="mono">Prec. acum. 14 dias</td>
+            <td style="color:var(--red)">−0,082</td>
+            <td style="color:var(--red)">−0,102</td>
+            <td style="color:var(--ndvi)">+0,055</td>
+            <td style="color:var(--red)">−0,179</td>
+            <td class="muted">Fraca — NDVI mais controlado pela fenologia do que pela chuva</td>
+          </tr>
+          <tr>
+            <td class="mono">Temp. Média (°C)</td>
+            <td style="color:var(--red)">−0,073</td>
+            <td style="color:var(--red)">−0,117</td>
+            <td style="color:var(--ndvi)">+0,005</td>
+            <td style="color:var(--red)">−0,002</td>
+            <td class="muted">Praticamente nula — temperatura dentro da faixa ótima do milho</td>
+          </tr>
+          <tr>
+            <td class="mono">Radiação Solar (W/m²)</td>
+            <td style="color:var(--red)">−0,072</td>
+            <td style="color:var(--red)">−0,315</td>
+            <td style="color:var(--red)">−0,266</td>
+            <td style="color:var(--red)">−0,212</td>
+            <td class="muted">⚠️ Negativa — dias mais ensolarados coincidiram com períodos secos</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CHART 1: NDVI + Umidade Silagem -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b1">NDVI × Umidade Relativa — Silagem</span>
+        <span style="color:var(--muted);font-size:13px">r = +0,27 a +0,36 — maior correlação detectada</span>
+      </div>
+      <canvas id="chartCorrSilagemUmid" height="110"></canvas>
+    </div>
+
+    <!-- CHART 2: NDVI + Umidade Grão -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b3">NDVI × Umidade Relativa — Grão</span>
+        <span style="color:var(--muted);font-size:13px">r = +0,34 a +0,40 — correlação mais forte nos talhões de grão</span>
+      </div>
+      <canvas id="chartCorrGraoUmid" height="110"></canvas>
+    </div>
+
+    <!-- CHART 3: NDVI + Prec 14d + Radiação -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b2">NDVI Médio × Precipitação 14d × Radiação Solar</span>
+        <span style="color:var(--muted);font-size:13px">Todos os talhões · eixo triplo</span>
+      </div>
+      <canvas id="chartCorrPrec" height="120"></canvas>
+    </div>
+
+    <!-- EVENTOS CHAVE -->
+    <h2 style="margin-top:8px">Eventos Climáticos Chave</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>🏆 Pico NDVI — 16/Jan/2026</h3>
+        <table>
+          <thead><tr><th>Variável</th><th>Valor</th></tr></thead>
+          <tbody>
+            <tr><td>NDVI médio</td><td style="color:var(--ndvi);font-weight:700">0,808</td></tr>
+            <tr><td>Prec. 14 dias</td><td>43,6 mm</td></tr>
+            <tr><td>Prec. 7 dias</td><td>37,4 mm</td></tr>
+            <tr><td>Temp. média</td><td>23,5°C</td></tr>
+            <tr><td>Umidade rel.</td><td>89,3%</td></tr>
+            <tr><td>Radiação</td><td>257 W/m²</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box" style="margin-top:12px;padding:10px 14px">
+          <strong>✅ Condição ideal</strong>
+          Umidade elevada, chuva acumulada moderada (sem excesso), temperatura ótima para milho — combinação perfeita para pico fotossintético.
+        </div>
+      </div>
+      <div class="card">
+        <h3>⚠️ Anomalia — 11/Jan/2026</h3>
+        <table>
+          <thead><tr><th>Variável</th><th>Valor</th></tr></thead>
+          <tbody>
+            <tr><td>NDVI Grão 4.0</td><td style="color:var(--red);font-weight:700">0,287</td></tr>
+            <tr><td>NDVI Grão Conv.</td><td style="color:var(--red)">0,250</td></tr>
+            <tr><td>NDVI Silagem (ok)</td><td style="color:var(--ndvi)">~0,44</td></tr>
+            <tr><td>Prec. 14 dias</td><td>88,0 mm</td></tr>
+            <tr><td>Temp. média</td><td>24,5°C</td></tr>
+            <tr><td>Umidade rel.</td><td>83,8%</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box" style="margin-top:12px;padding:10px 14px">
+          <strong>🚨 Artefato confirmado</strong>
+          Clima favorável + NDVI baixo seletivo só nos talhões de grão = nuvem parcial não detectada pela máscara B2. Deve ser tratado como outlier.
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>📌 Conclusão da Correlação</strong>
+      O NDVI dessa safra é primariamente controlado pela <strong>fenologia do milho</strong> (estágio de desenvolvimento) e não diretamente pelo clima. O clima age como <strong>fator modulador</strong>: a <strong>umidade relativa</strong> é a variável com maior relação positiva (r até +0,40), enquanto <strong>excesso de chuva acumulada</strong> prejudica — provavelmente via contaminação de nuvens nas imagens. A <strong>temperatura</strong> teve influência mínima, pois permaneceu dentro da faixa ótima do milho (20–35°C) durante toda a safra. A <strong>radiação solar elevada</strong> em dias secos correlacionou negativamente com o NDVI porque esses períodos coincidiram com fases vegetativas iniciais ou de senescência.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 08 — HETEROGENEIDADE ═══════════════════════════ -->
+  <div id="tab-heterogeneidade" class="tab-panel">
+    <div class="section-label">// 08 — Heterogeneidade Espacial</div>
+    <h2>Variabilidade Interna dos Talhões</h2>
+    <p style="color:var(--muted);margin-bottom:24px">Análise do desvio padrão do NDVI (<code>b1_std</code>) e do coeficiente de variação (<code>CV = std/média</code>) ao longo da safra. Altos valores indicam zonas de vigor diferente dentro do mesmo talhão.</p>
+
+    <!-- ── CONCEITO ── -->
+    <h2>Entendendo o Conceito</h2>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>🛰️ O que é heterogeneidade espacial?</h3>
+        <p>Cada pixel de uma imagem Sentinel-2 representa um pedaço de <strong>10×10 metros</strong> do talhão, com seu próprio valor de NDVI. Num talhão ideal e uniforme, todos os pixels teriam exatamente o mesmo valor. Na realidade, nunca é assim.</p>
+        <p><strong>Heterogeneidade</strong> é o quanto os pixels <em>discordam entre si</em> dentro do mesmo talhão. Pense assim: se o NDVI médio é a <em>"nota da turma"</em>, o desvio padrão diz se todos tiraram notas parecidas — ou se metade tirou 10 e a outra metade tirou 4.</p>
+      </div>
+      <div class="card">
+        <h3>📐 O que o b1_std mede?</h3>
+        <p>O <code>b1_std</code> é o <strong>desvio padrão do NDVI</strong> de todos os pixels válidos de uma imagem:</p>
+        <div class="ndvi-scale" style="margin:12px 0">
+          <div class="ndvi-bar">
+            <div class="ndvi-color" style="background:var(--ndvi)"></div>
+            <span class="ndvi-range">STD ~0,10</span>
+            <span class="ndvi-name">Talhão uniforme — plantas no mesmo estágio</span>
+          </div>
+          <div class="ndvi-bar">
+            <div class="ndvi-color" style="background:var(--yellow)"></div>
+            <span class="ndvi-range">STD ~0,18</span>
+            <span class="ndvi-name">Variação moderada — zonas em ritmos distintos</span>
+          </div>
+          <div class="ndvi-bar">
+            <div class="ndvi-color" style="background:var(--red)"></div>
+            <span class="ndvi-range">STD &gt; 0,25</span>
+            <span class="ndvi-name">Alta variação — stress localizado ou transição fenológica</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📊 b1_std vs. Coeficiente de Variação (CV)</h3>
+      <p>O problema do STD puro é que ele não considera o nível do NDVI médio. Um STD de 0,15 num talhão com NDVI médio 0,20 é <strong>enorme</strong> (variação relativa de 75%), mas num talhão com NDVI médio 0,80 é <strong>pequeno</strong> (variação relativa de apenas 19%). O CV resolve isso:</p>
+      <div class="note-box" style="margin:12px 0">
+        <strong>Fórmula</strong>
+        <code>CV = b1_std ÷ b1_mean</code> — quanto menor o CV, mais uniforme o talhão está <em>em relação ao seu próprio nível de vegetação</em>.
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🌱 Por que isso importa agronomicamente?</h3>
+      <p><strong>Alta heterogeneidade = partes do talhão performando de forma diferente.</strong> As causas mais comuns no milho são:</p>
+      <div class="card-grid" style="margin-top:12px;gap:10px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">SOLO</div>
+          <p style="margin:0;font-size:13px">Variação natural de textura, matéria orgânica e drenagem entre zonas do talhão</p>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">STAND</div>
+          <p style="margin:0;font-size:13px">Falhas de emergência — sementes que não germinaram em áreas específicas</p>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">MANEJO</div>
+          <p style="margin:0;font-size:13px">Distribuição desigual de fertilizantes ou defensivos ao longo do talhão</p>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">STRESS</div>
+          <p style="margin:0;font-size:13px">Stress hídrico, pragas ou compactação concentrados em zonas específicas</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🔬 Heterogeneidade e Agricultura de Precisão 4.0</h3>
+      <p>O STD alto não é necessariamente ruim — depende do contexto:</p>
+      <table style="margin-top:12px">
+        <thead><tr><th>Situação</th><th>STD alto significa</th><th>Ação indicada</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Nov/25 — Estabelecimento</td>
+            <td class="muted">Plantas em estágios distintos de emergência</td>
+            <td class="muted">Normal — aguardar uniformização</td>
+          </tr>
+          <tr>
+            <td>Talhão com manejo 4.0</td>
+            <td style="color:var(--ndvi)">Zonas de manejo se diferenciando como planejado</td>
+            <td class="muted">✅ Resultado esperado e positivo</td>
+          </tr>
+          <tr>
+            <td>Talhão Conv. em crescimento</td>
+            <td style="color:var(--yellow)">Variabilidade natural não gerenciada</td>
+            <td class="muted">⚠️ Identificar zonas para futuro 4.0</td>
+          </tr>
+          <tr>
+            <td>STD alto + NDVI baixo</td>
+            <td style="color:var(--red)">Stress localizado ou falha de stand</td>
+            <td class="muted">🚨 Investigar e intervir</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr class="divider">
+    <h2>Análise dos Dados — Safra 2025–2026</h2>
+    <div class="stats-row">
+      <div class="stat-pill">
+        <span class="stat-value" style="color:var(--ndvi)">0,186</span>
+        <span class="stat-label">STD médio Silagem 4.0</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">0,158</span>
+        <span class="stat-label">STD médio Silagem Conv.</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">0,144</span>
+        <span class="stat-label">STD médio Grão 4.0</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value">0,143</span>
+        <span class="stat-label">STD médio Grão Conv.</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value" style="color:var(--yellow)">Nov/25</span>
+        <span class="stat-label">Mês mais heterogêneo</span>
+      </div>
+    </div>
+
+    <!-- CHART 1: STD temporal por talhão -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b1">Evolução do b1_std — 4 Talhões</span>
+        <span style="color:var(--muted);font-size:13px">Desvio padrão do NDVI ao longo do tempo</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Picos de STD indicam momentos de transição fenológica — quando partes do talhão estão em estágios diferentes de desenvolvimento.</p>
+      <canvas id="chartHeteroStd" height="120"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        O eixo Y mostra o desvio padrão do NDVI — quanto maior, mais os pixels divergem entre si. Observe que <strong>todos os talhões sobem em novembro</strong>: é o estabelecimento do milho, quando partes do talhão ainda têm solo exposto enquanto outras já estão com plantas emergidas. A <strong>Silagem 4.0 consistentemente mais alta</strong> que a Convencional reflete as zonas de manejo diferenciado atuando — cada zona recebe dose distinta de insumo e responde de forma diferente. O <strong>vale em janeiro</strong> (especialmente 16/jan, pico de NDVI) mostra que no auge do crescimento os talhões ficaram mais uniformes: todas as zonas convergiram para alto vigor simultaneamente.
+      </div>
+    </div>
+
+    <!-- CHART 2: CV por talhão -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b2">Coeficiente de Variação (CV = std / média)</span>
+        <span style="color:var(--muted);font-size:13px">Heterogeneidade relativa — normaliza o STD pelo NDVI médio</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px">CV alto no pré-plantio e estabelecimento é esperado. CV alto durante o crescimento activo sinaliza zonas problemáticas dentro do talhão.</p>
+      <canvas id="chartHeteroCV" height="120"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        O CV corrige uma limitação do STD: um desvio de 0,15 é muito diferente quando o NDVI médio é 0,20 (75% de variação!) ou 0,80 (apenas 19%). Por isso o CV é mais honesto para comparar momentos distintos da safra. Note o <strong>pico altíssimo em setembro/outubro</strong> — o NDVI médio estava baixo (solo exposto após a cultura anterior) e qualquer pequena diferença entre pixels gerava CV enorme. O <strong>ponto de maior estabilidade relativa</strong> ocorre em janeiro, quando o CV cai mesmo com STD ainda razoável — porque o denominador (NDVI médio) subiu muito. O <strong>spike do Grão 4.0 em 06/jan</strong> (CV ~0,92) é a anomalia de nuvem parcial identificada anteriormente: NDVI artificialmente baixo inflou o CV.
+      </div>
+    </div>
+
+    <!-- CHART 3: STD médio mensal comparativo -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b3">STD Médio Mensal — Comparativo</span>
+        <span style="color:var(--muted);font-size:13px">Evolução da heterogeneidade mês a mês</span>
+      </div>
+      <canvas id="chartHeteroMensal" height="110"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        Aqui cada barra é a média do STD de todas as imagens válidas daquele mês — uma visão agregada da heterogeneidade. <strong>Novembro se destaca como o mês mais variável</strong> em todos os talhões: é a fase de estabelecimento, quando a lavoura ainda não está homogeneamente coberta. <strong>Agosto e setembro</strong> têm STD baixo porque a cultura anterior (pré-colheita) cobria o talhão de forma mais uniforme. <strong>Dezembro e fevereiro</strong> apresentam STD elevado nos talhões de silagem — coincide com os grandes eventos de chuva registrados pelo Metos (320mm em dez e 91mm em 08/fev), que além de gerar nuvens podem ter causado encharcamento localizado e stress em partes do talhão.
+      </div>
+    </div>
+
+    <!-- CHART 4: Evolução de classes por fase fenológica -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b1">Distribuição de Classes por Fase Fenológica</span>
+        <span style="color:var(--muted);font-size:13px">% pixels por classe de vigor em cada fase da safra · Silagem 4.0 vs Grão 4.0</span>
+      </div>
+      <canvas id="chartHeteroFase" height="130"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        Cada barra empilhada mostra como os pixels do talhão se distribuem entre as classes de vigor em cada fase da safra. A <strong>progressão ideal</strong> seria: Solo → Veg. Baixa → Veg. Mod. → Veg. Alta → Veg. Densa, e isso é exatamente o que se observa da esquerda para a direita. A <strong>diferença mais marcante entre Silagem 4.0 e Grão 4.0</strong> aparece na fase de Crescimento/Pico: a Silagem 4.0 teve <strong>50% dos pixels em vegetação densa</strong> contra apenas 18% do Grão 4.0 — reflexo da diferença de ciclo e biomassa entre as culturas. No <strong>pós-pico</strong>, a Silagem mantém mais densa (32,9%) que o Grão (9,2%), mas o Grão avança em veg. alta (52,9%) — indicando que o enchimento de grãos ainda mantém o dossel verde mesmo com o ciclo mais longo.
+      </div>
+    </div>
+
+
+    <!-- ANÁLISE 4.0 vs CONV -->
+    <h2 style="margin-top:8px">Ag. Precisão 4.0 vs Convencional — Variabilidade</h2>
+    <div class="card-grid">
+      <div class="card">
+        <h3>🌿 Silagem: 4.0 com +17,7% de STD</h3>
+        <table>
+          <thead><tr><th>Talhão</th><th>STD médio</th><th>CV médio</th><th>Corr. STD×NDVI</th></tr></thead>
+          <tbody>
+            <tr><td>Silagem 4.0</td><td style="color:var(--ndvi);font-weight:700">0,1864</td><td>0,398</td><td style="color:var(--blue)">−0,181</td></tr>
+            <tr><td>Silagem Conv.</td><td>0,1583</td><td>0,354</td><td style="color:var(--blue)">−0,187</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box" style="margin-top:12px;padding:10px 14px;font-size:12px">
+          <strong>✅ STD maior no 4.0 = esperado</strong>
+          Zonas de manejo diferenciado amplificam o contraste de vigor entre áreas. A correlação negativa confirma que no pico, o talhão se torna mais homogêneo — as zonas convergem para alto vigor.
+        </div>
+      </div>
+      <div class="card">
+        <h3>🌾 Grão: 4.0 ≈ Conv. (+0,6%)</h3>
+        <table>
+          <thead><tr><th>Talhão</th><th>STD médio</th><th>CV médio</th><th>Corr. STD×NDVI</th></tr></thead>
+          <tbody>
+            <tr><td>Grão 4.0</td><td>0,1435</td><td>0,368</td><td style="color:var(--yellow)">+0,532</td></tr>
+            <tr><td>Grão Conv.</td><td>0,1426</td><td>0,343</td><td style="color:var(--yellow)">+0,437</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box" style="margin-top:12px;padding:10px 14px;font-size:12px">
+          <strong>⚠️ Correlação positiva STD×NDVI</strong>
+          Quanto maior o NDVI nos talhões de grão, maior a variabilidade. Zonas dentro do talhão crescem em ritmos distintos — potencial alvo para manejo por zonas futuro.
+        </div>
+      </div>
+    </div>
+
+    <!-- PICO SILAGEM NO PICO NDVI -->
+    <h2>Distribuição de Pixels no Pico (16/Jan/2026)</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Talhão</th><th>Solo</th><th>Veg. Baixa</th><th>Veg. Mod.</th><th>Veg. Alta</th><th>Veg. Densa</th><th>STD no pico</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Silagem 4.0</td><td>1,1%</td><td>0,8%</td><td>1,3%</td><td>13,0%</td>
+            <td style="color:var(--ndvi);font-weight:700">82,2% 🏆</td><td class="muted">0,170</td>
+          </tr>
+          <tr>
+            <td>Silagem Conv.</td><td>1,4%</td><td>0,8%</td><td>3,5%</td><td>19,4%</td>
+            <td style="color:var(--ndvi)">75,0%</td><td class="muted">0,137</td>
+          </tr>
+          <tr>
+            <td>Grão 4.0</td><td>3,4%</td><td>4,7%</td><td>8,0%</td><td>21,5%</td>
+            <td style="color:var(--yellow)">62,1%</td><td class="muted">0,200</td>
+          </tr>
+          <tr>
+            <td>Grão Conv.</td><td>3,4%</td><td>4,5%</td><td>5,8%</td><td>19,6%</td>
+            <td style="color:var(--yellow)">66,7%</td><td class="muted">0,157</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box">
+      <strong>🔬 Interpretação Agronômica</strong>
+      A <strong>Silagem 4.0</strong> atingiu <strong>82% de pixels com vegetação densa</strong> no pico — a maior cobertura registrada — com STD relativamente baixo (0,170), indicando alta uniformidade no vigor máximo. Isso sugere que o manejo por zonas nivelou o desempenho para cima. Nos <strong>talhões de Grão</strong>, a correlação positiva STD×NDVI revela zonas com ritmos de crescimento distintos — informação valiosa para definir <strong>zonas de manejo futuras</strong>. O <strong>STD elevado de novembro</strong> em todos os talhões corresponde ao período de estabelecimento heterogêneo — normal na emergência do milho, quando plantas em diferentes estágios coexistem no mesmo talhão.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 09 — CONCLUSÕES ═══════════════════════════ -->
+  <div id="tab-conclusoes" class="tab-panel">
+    <div class="section-label">// 09 — Síntese e Conclusões</div>
+    <h2>Inferências Finais — Safra 2025–2026</h2>
+    <p style="color:var(--muted);margin-bottom:28px">Consolidação de todas as análises realizadas: NDVI, clima, correlações e heterogeneidade espacial. Base para a apresentação acadêmica.</p>
+
+    <!-- MENSAGEM CENTRAL -->
+    <div style="background:linear-gradient(135deg,rgba(61,220,132,0.08),rgba(61,220,132,0.03));border:1px solid rgba(61,220,132,0.3);border-radius:12px;padding:28px;margin-bottom:28px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ndvi),transparent)"></div>
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">// Mensagem Central</div>
+      <p style="font-family:'Syne',sans-serif;font-size:17px;color:var(--white);line-height:1.6;margin:0">
+        O monitoramento por NDVI demonstrou ser uma ferramenta viável e informativa para acompanhamento da safra de milho — com crescimento adequado, pico fenológico identificado e correlação com eventos climáticos confirmada. As principais limitações foram a cobertura de nuvens em períodos críticos e a ausência de dados de produtividade para validação final. O <strong style="color:var(--ndvi)">paradoxo NDVI Convencional&nbsp;&gt;&nbsp;4.0</strong> abre a discussão mais relevante do projeto: <em>NDVI mede biomassa, não eficiência agronômica — e a agricultura de precisão joga em outra dimensão.</em>
+      </p>
+    </div>
+
+    <!-- VEREDICTOS POR TEMA -->
+    <h2>Veredictos por Tema</h2>
+    <div class="card-grid" style="margin-bottom:24px">
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌱</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Crescimento da Lavoura</span>
+          <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">BOM</span>
+        </div>
+        <p>Pico de NDVI em 16/jan/2026 com valores de <strong>0,839</strong> (Silagem 4.0) — cobertura densa em mais de 80% dos pixels. A curva fenológica seguiu o padrão esperado para milho tropical, com crescimento progressivo de novembro a janeiro.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌧️</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Qualidade dos Dados</span>
+          <span style="margin-left:auto;background:rgba(245,200,66,0.12);color:var(--yellow);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(245,200,66,0.25)">PARCIAL</span>
+        </div>
+        <p><strong>39,3% das imagens inutilizadas por nuvens</strong>. Outubro (plantio) e dezembro (chuvas extremas) foram os meses mais prejudicados. Janeiro compensou com 84% de aproveitamento e capturou o pico. A anomalia de 11/jan confirmou a necessidade de validação cruzada com dados climáticos.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌡️</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Influência Climática</span>
+          <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">MODERADA</span>
+        </div>
+        <p>O NDVI foi primariamente controlado pela <strong>fenologia</strong>, não pelo clima. A umidade relativa foi a variável com maior correlação positiva (r até +0,40). O déficit hídrico de janeiro (−45mm) coincidiu com o pico de NDVI — a lavoura absorveu o estresse sem colapso visível no satélite.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🔬</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Ag. Precisão 4.0</span>
+          <span style="margin-left:auto;background:rgba(245,147,66,0.15);color:var(--orange,#f59342);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(245,147,66,0.3)">EM ABERTO</span>
+        </div>
+        <p>O NDVI médio do Convencional supera o 4.0 nos talhões de grão — mas esse é o <strong>resultado esperado</strong> de um manejo que redistribui insumos por zona, não que maximiza a média. A prova definitiva virá com os <strong>mapas de yield em mai/2026</strong>.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">📐</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Heterogeneidade</span>
+          <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">INFORMATIVO</span>
+        </div>
+        <p>Silagem 4.0 com <strong>17,7% mais STD</strong> — confirmando diferenciação das zonas de manejo. Talhões de grão com correlação STD×NDVI positiva (+0,53) revelam zonas internas com ritmos distintos de crescimento: mapa pronto para futuras zonas de manejo.</p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:22px">🌽</span>
+          <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--white)">Silagem vs. Grão</span>
+          <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">CLARO</span>
+        </div>
+        <p>Silagem consistentemente superior em biomassa: NDVI médio <strong>18% maior</strong>, 3× mais pixels densos no pico, menor solo exposto. Biologicamente esperado — cultivares de silagem priorizam massa total, não enchimento de grão.</p>
+      </div>
+
+    </div>
+
+    <!-- PONTOS FORTES E FRACOS -->
+    <div class="card-grid" style="margin-bottom:24px">
+      <div class="card">
+        <h3>✅ Pontos Fortes do Estudo</h3>
+        <table>
+          <tbody>
+            <tr><td style="color:var(--ndvi);font-size:18px;width:32px">+</td><td>Série temporal de 6 meses com 4 talhões simultâneos</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Cruzamento NDVI × dados climáticos horários (Metos Pro)</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Validação cruzada que identificou e explicou anomalias</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Análise de heterogeneidade espacial (b1_std e CV)</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Comparativo simultâneo Convencional vs. Ag. 4.0</td></tr>
+            <tr><td style="color:var(--ndvi);font-size:18px">+</td><td>Pico fenológico capturado com condições ideais validadas</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>⚠️ Limitações e Pontos de Melhoria</h3>
+        <table>
+          <tbody>
+            <tr><td style="color:var(--red);font-size:18px;width:32px">−</td><td>39,3% de imagens perdidas por nuvens — outubro crítico</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Sem dados de solo para correlação com variabilidade interna</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Sem histórico de doses e zonas aplicadas no manejo 4.0</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Máscara de qualidade B2 falhou em nuvens parciais (11/jan)</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Yield ausente — impossível validar NDVI vs. produtividade real</td></tr>
+            <tr><td style="color:var(--red);font-size:18px">−</td><td>Diferença de cultivar entre talhões não controlada</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LINHA DO TEMPO DAS DESCOBERTAS -->
+    <h2>Linha do Tempo das Descobertas</h2>
+    <div class="timeline" style="margin-bottom:28px">
+
+      <div class="tl-item">
+        <div class="tl-date">Out–Nov 2025</div>
+        <div class="tl-title">📷 Dados escassos no período crítico</div>
+        <div class="tl-desc">Outubro teve 71% de imagens nubladas — o plantio e emergência do milho ficaram praticamente sem cobertura satelital. Novembro compensou com 75% de aproveitamento e revelou o início do crescimento diferenciado entre talhões.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Dez 2025</div>
+        <div class="tl-title">🌧️ Dezembro chuvoso = lacuna na série</div>
+        <div class="tl-desc">320mm de precipitação e evento de 129,4mm em um único dia (09/12) comprometeram 67% das imagens. Os dados do Metos foram essenciais para explicar essa lacuna e evitar interpretações erradas da série NDVI.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">11 Jan 2026</div>
+        <div class="tl-title">🚨 Anomalia detectada e explicada</div>
+        <div class="tl-desc">Queda abrupta para NDVI 0,25 nos talhões de grão com clima favorável — diagnóstico de contaminação por nuvem parcial não mascarada. Exemplo prático da importância da validação cruzada com dados meteorológicos.</div>
+      </div>
+
+      <div class="tl-item now">
+        <div class="tl-date">16 Jan 2026</div>
+        <div class="tl-title">🏆 Pico universal — melhor dia da safra</div>
+        <div class="tl-desc">Todos os 4 talhões atingiram seu máximo NDVI simultâneamente. Condições perfeitas confirmadas: umidade 89%, temperatura 23,5°C, precipitação acumulada moderada. Silagem 4.0 liderou com 0,839 e 82% de pixels densos.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Fev 2026</div>
+        <div class="tl-title">📉 Pós-pico e nova janela de nuvens</div>
+        <div class="tl-desc">NDVI começa a recuar em alguns talhões — sinal de início de senescência ou stress. Evento de 91mm em 08/02 comprometeu as imagens NDVI #2 planejadas. Último dado válido geral em 20/02/26.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-date">Mai 2026</div>
+        <div class="tl-title">⏳ Yield — o dado que falta</div>
+        <div class="tl-desc">Colheita dos talhões de grão e geração dos mapas de produtividade. Esse dado fechará o ciclo e permitirá validar se o NDVI foi um bom preditor de produtividade — e se o manejo 4.0 entregou mais eficiência por área.</div>
+      </div>
+
+    </div>
+
+    <!-- PRÓXIMOS PASSOS -->
+    <h2>Próximos Passos do Projeto</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>Etapa</th><th>Quando</th><th>O que responderá</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Correlação NDVI × Yield</td>
+            <td class="mono">Mai/2026</td>
+            <td class="muted">NDVI foi bom preditor de produtividade real?</td>
+          </tr>
+          <tr>
+            <td>Comparativo 4.0 × Conv. no Yield</td>
+            <td class="mono">Mai/2026</td>
+            <td class="muted">O manejo de precisão entregou mais com menos insumo?</td>
+          </tr>
+          <tr>
+            <td>Mapa de zonas de vigor × Mapa de yield</td>
+            <td class="mono">Mai/2026</td>
+            <td class="muted">As zonas de alto STD coincidem com zonas de menor produtividade?</td>
+          </tr>
+          <tr>
+            <td>Análise de solo dos talhões</td>
+            <td class="mono">A definir</td>
+            <td class="muted">A variabilidade de NDVI tem origem pedológica?</td>
+          </tr>
+          <tr>
+            <td>Imagens de alta resolução (drone)</td>
+            <td class="mono">A definir</td>
+            <td class="muted">Confirmar falhas de stand em pixels de baixo NDVI?</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note-box">
+      <strong>🎓 Para a Apresentação Acadêmica</strong>
+      Os dados sustentam uma narrativa clara em três atos: <strong>(1) O satélite funcionou</strong> — a curva fenológica foi capturada, o pico identificado, eventos climáticos rastreados. <strong>(2) Os dados têm limitações reais</strong> — nuvens, anomalias e ausência de yield são lacunas honestas que demonstram maturidade metodológica. <strong>(3) A pergunta mais importante ainda não tem resposta</strong> — e isso é o que torna o projeto academicamente relevante. NDVI é biomassa. Produtividade é outra coisa. E a agricultura de precisão 4.0 opera nesse espaço entre os dois.
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 10 — GAP-FILLING ═══════════════════════════ -->
+  <div id="tab-gapfilling" class="tab-panel">
+    <div class="section-label">// 10 — Gap-Filling Temporal</div>
+    <h2>Substituição de Imagens Nubladas por Estimativa de NDVI</h2>
+    <p style="color:var(--muted);margin-bottom:24px">Técnica recomendada pelo professor — preenche as lacunas causadas por cobertura de nuvens usando o histórico de imagens válidas do mesmo talhão.</p>
+
+    <!-- CONCEITO -->
+    <div class="card">
+      <h3>💡 O que é Gap-Filling?</h3>
+      <p>Quando um pixel (ou imagem inteira) é marcado como inválido por nuvem (<code>b1_valid_pixels = 0</code>), perdemos a observação daquele dia. O Gap-Filling é a técnica de <strong>estimar o valor que deveria estar ali</strong> com base nos dados disponíveis. É amplamente usado em séries temporais de sensoriamento remoto.</p>
+      <p>No nosso dataset, <strong>39,3% das imagens são nubladas</strong> — sem gap-filling, temos buracos na série que dificultam a análise fenológica. Com ele, podemos reconstruir uma série contínua.</p>
+    </div>
+
+    <!-- 3 MÉTODOS -->
+    <h2>Os 3 Métodos Implementados</h2>
+    <div class="card-grid" style="margin-bottom:24px">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-family:'Space Mono',monospace;font-size:18px;color:var(--blue);font-weight:700">M1</span>
+          <h3 style="margin:0">Forward Fill</h3>
+        </div>
+        <p>Substitui o gap pelo <strong>último valor válido anterior</strong>. É o método mais simples — "se não sei o de hoje, uso o de ontem".</p>
+        <table style="margin-top:8px">
+          <tbody>
+            <tr><td style="color:var(--ndvi)">✅ Vantagem</td><td class="muted">Simples, sem risco de usar dados futuros</td></tr>
+            <tr><td style="color:var(--red)">⚠️ Limitação</td><td class="muted">Congela o valor por longos períodos — ignora o crescimento real</td></tr>
+            <tr><td>Melhor para</td><td class="muted">Gaps curtos (1–2 datas)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-family:'Space Mono',monospace;font-size:18px;color:var(--yellow);font-weight:700">M2</span>
+          <h3 style="margin:0">Média N Anteriores</h3>
+        </div>
+        <p>Substitui pelo <strong>valor médio das N imagens válidas anteriores</strong>. É o método sugerido pelo professor — suaviza variações pontuais.</p>
+        <table style="margin-top:8px">
+          <tbody>
+            <tr><td style="color:var(--ndvi)">✅ Vantagem</td><td class="muted">Robusto a outliers — não deixa um dia ruim contaminar o gap</td></tr>
+            <tr><td style="color:var(--red)">⚠️ Limitação</td><td class="muted">Subestima o NDVI em fases de crescimento rápido</td></tr>
+            <tr><td>Melhor para</td><td class="muted">Períodos de NDVI estável (N=3 por padrão)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-family:'Space Mono',monospace;font-size:18px;color:var(--ndvi);font-weight:700">M3</span>
+          <h3 style="margin:0">Interpolação Linear ⭐</h3>
+        </div>
+        <p>Calcula o valor esperado <strong>entre o último ponto válido antes e o primeiro depois</strong> do gap. Captura a tendência de crescimento.</p>
+        <table style="margin-top:8px">
+          <tbody>
+            <tr><td style="color:var(--ndvi)">✅ Vantagem</td><td class="muted">Respeita a fenologia — planta cresce linearmente entre observações</td></tr>
+            <tr><td style="color:var(--red)">⚠️ Limitação</td><td class="muted">Requer ao menos um ponto válido depois do gap</td></tr>
+            <tr><td>Melhor para</td><td class="muted">Fases de crescimento ativo — <strong>recomendado para milho</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GRÁFICO COMPARATIVO -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b1">Comparativo dos 3 Métodos — Silagem 4.0</span>
+        <span style="color:var(--muted);font-size:13px">49 datas · 19 gaps preenchidos · linha tracejada = estimativa</span>
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:16px">
+        Pontos sólidos = NDVI real válido. Pontos vazados = valores estimados pelo gap-filling. Regiões cinzas = datas com imagem nublada.
+      </p>
+      <canvas id="chartGapFilling" height="140"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📖 Como ler este gráfico</strong>
+        As três linhas coloridas representam os três métodos. Onde há dados válidos (pontos sólidos), as linhas coincidem. Nas regiões cinzas (nuvens), cada método estima de forma diferente. Note como a <strong>interpolação linear (verde)</strong> captura melhor a tendência de crescimento de outubro a janeiro — ela "sabe" que o milho está crescendo e estima valores progressivamente maiores. O <strong>forward fill (azul)</strong> mantém o valor anterior congelado, criando degraus. A <strong>média (amarelo)</strong> fica entre os dois, mas tende a ficar abaixo do real em fases de crescimento acelerado.
+      </div>
+    </div>
+
+    <h2>Análise por Talhão (Saídas do Script)</h2>
+<div class="carousel-container">
+  <div class="carousel-track" id="carouselTrack">
+    <div class="carousel-slide">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+          <h3>Silagem Convencional (0bf86c8b)</h3>
+          <span class="talhao-tag tag-silagem">Convencional</span>
+        </div>
+        <img src="plots/gap_filling_Silagem_Conv.png" alt="Silagem Conv" style="width:100%; border-radius:6px;" onclick="openModal(this)">
+      </div>
+    </div>
+    
+    <div class="carousel-slide">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+          <h3>Silagem 4.0 (f791bf13)</h3>
+          <span class="talhao-tag tag-40">Ag. Precisão 4.0</span>
+        </div>
+        <img src="plots/gap_filling_Silagem_40.png" alt="Silagem 4.0" style="width:100%; border-radius:6px;" onclick="openModal(this)">
+      </div>
+    </div>
+
+    <div class="carousel-slide">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+          <h3>Grão Convencional (b7292cb8)</h3>
+          <span class="talhao-tag tag-grao">Convencional</span>
+        </div>
+        <img src="plots/gap_filling_Grão_Conv.png" alt="Grão Conv" style="width:100%; border-radius:6px;" onclick="openModal(this)">
+      </div>
+    </div>
+
+    <div class="carousel-slide">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+          <h3>Grão 4.0 (258e47e0)</h3>
+          <span class="talhao-tag tag-40">Ag. Precisão 4.0</span>
+        </div>
+        <img src="plots/gap_filling_Grão_40.png" alt="Grão 4.0" style="width:100%; border-radius:6px;" onclick="openModal(this)">
+      </div>
+    </div>
+  </div>
+
+  <div class="carousel-nav">
+    <button class="carousel-btn" onclick="moveSlide(-1)">❮</button>
+    <div class="carousel-dots" id="carouselDots">
+      <span class="dot active" onclick="jumpToSlide(0)"></span>
+      <span class="dot" onclick="jumpToSlide(1)"></span>
+      <span class="dot" onclick="jumpToSlide(2)"></span>
+      <span class="dot" onclick="jumpToSlide(3)"></span>
+    </div>
+    <button class="carousel-btn" onclick="moveSlide(1)">❯</button>
+  </div>
+</div>
+
+    <!-- CÓDIGO PYTHON -->
+    <h2>Código Python — Como Executar</h2>
+    <div class="card">
+      <h3>📦 Instalação das dependências</h3>
+      <div class="code-block" style="margin-bottom:16px">pip install pandas numpy matplotlib</div>
+
+      <h3>▶️ Execução</h3>
+      <div class="code-block" style="margin-bottom:16px"># Coloque o arquivo gap_filling_ndvi.py na mesma pasta do ndvi_metadata.csv
+python gap_filling_ndvi.py</div>
+
+      <h3>📁 Saídas geradas</h3>
+      <div class="file-list">
+        <div class="file-item">
+          <span class="file-icon ext-csv">CSV</span>
+          <span class="file-name">output_gap_filling/ndvi_gap_filled.csv</span>
+          <span class="file-desc">Série completa com os 3 métodos preenchidos para todos os talhões</span>
+        </div>
+        <div class="file-item">
+          <span class="file-icon ext-jpg">PNG</span>
+          <span class="file-name">output_gap_filling/gap_filling_{talhao}.png</span>
+          <span class="file-desc">Gráfico comparativo dos 3 métodos por talhão (4 arquivos)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PSEUDOCÓDIGO -->
+    <div class="card">
+      <h3>🧠 Lógica do Algoritmo (Pseudocódigo)</h3>
+      <div class="code-block">
+# Para cada talhão:
+for cada_data in todas_as_datas:
+
+    if imagem_é_valida:
+        ndvi[data] = b1_mean  # usa o valor real
+
+    else:  # imagem nublada
+        anteriores = [ndvi[d] for d in datas_anteriores if valida]
+
+        # Método 1 — Forward Fill
+        m1[data] = anteriores[-1]
+
+        # Método 2 — Média N anteriores (professor)
+        m2[data] = mean(anteriores[-N:])
+
+        # Método 3 — Interpolação Linear (recomendado)
+        prox_valido = primeiro valor válido depois desta data
+        m3[data] = interpola(anteriores[-1], prox_valido, posição_temporal)
+      </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <h2>Resultados — Gaps Preenchidos</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Talhão</th><th>Total datas</th><th>Nubladas</th><th>Após gap-fill</th><th>Gaps restantes*</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Silagem 4.0</td>  <td>49</td><td style="color:var(--red)">19 (38,8%)</td><td style="color:var(--ndvi)">48 válidas</td><td class="muted">1 (início da série)</td></tr>
+          <tr><td>Silagem Conv.</td><td>49</td><td style="color:var(--red)">20 (40,8%)</td><td style="color:var(--ndvi)">48 válidas</td><td class="muted">1 (início da série)</td></tr>
+          <tr><td>Grão 4.0</td>     <td>49</td><td style="color:var(--red)">18 (36,7%)</td><td style="color:var(--ndvi)">48 válidas</td><td class="muted">1 (início da série)</td></tr>
+          <tr><td>Grão Conv.</td>   <td>49</td><td style="color:var(--red)">20 (40,8%)</td><td style="color:var(--ndvi)">48 válidas</td><td class="muted">1 (início da série)</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:var(--muted);margin-top:8px">* O gap da primeira data (04/08/25) não pode ser preenchido pela interpolação pois não há histórico anterior — é o único gap irrecuperável.</p>
+    </div>
+
+    <div class="note-box">
+      <strong>⚠️ Importante para o Relatório Acadêmico</strong>
+      Os valores preenchidos pelo gap-filling são <strong>estimativas, não observações reais</strong>. Ao usá-los em análises, é necessário distinguir claramente os dados originais dos estimados — por exemplo, usando uma coluna <code>is_gap_filled = True/False</code> no CSV. O Método 3 (interpolação linear) é o recomendado para fenologia de culturas porque respeita a tendência de crescimento, mas ainda assim introduz incerteza que deve ser documentada na metodologia do trabalho.
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-left">NDVI FARMLAB · SAFRA 2025–2026 · JACTO / ONE SOIL</div>
+  <div class="footer-right">Sentinel-2 (ESA) · EPSG:31982 · v1.0</div>
+</footer>
+
+<!-- ── DEV BAR: DOWNLOAD + COMMIT ── -->
+<div class="dev-bar">
+  <div class="dev-panel" id="dev-panel">
+    <div class="dev-panel-title">// Download &amp; Commit</div>
+
+    <button class="dev-btn btn-download" onclick="downloadSite()">
+      ⬇ Baixar diario_ndvi.html
+    </button>
+
+    <div class="commit-section">
+      <div class="commit-label">Mensagem do Commit</div>
+      <div class="commit-input-row">
+        <input
+          class="commit-msg-input"
+          id="commit-msg"
+          type="text"
+          placeholder="ex: add análise temporal"
+          oninput="updateCommit()"
+        />
+      </div>
+      <div class="commit-label" style="margin-top:8px">Comandos Git</div>
+      <div class="code-block" id="commit-code">git add diario_ndvi.html
+git commit -m "update: diário de bordo ndvi"
+git push</div>
+      <button class="dev-btn btn-copy" onclick="copyCommit()">⎘ Copiar Comandos</button>
+      <div class="copy-feedback" id="copy-feedback">✓ Copiado!</div>
+    </div>
+  </div>
+
+  <button class="dev-toggle" onclick="togglePanel()">
+    <span id="toggle-icon">⚙</span> Deploy
+  </button>
+</div>
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function downloadSite() {
+    const html = document.documentElement.outerHTML;
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'diario_ndvi.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  // ── COMMIT MESSAGE ──
+  function updateCommit() {
+    const msg = document.getElementById('commit-msg').value.trim();
+    const label = msg || 'update: diário de bordo ndvi';
+    document.getElementById('commit-code').textContent =
+      `git add diario_ndvi.html\ngit commit -m "${label}"\ngit push`;
+  }
+
+  // ── COPY COMMANDS ──
+  function copyCommit() {
+    const text = document.getElementById('commit-code').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const fb = document.getElementById('copy-feedback');
+      fb.classList.add('show');
+      setTimeout(() => fb.classList.remove('show'), 2200);
+    });
+  }
+
+  // ── TOGGLE PANEL ──
+  function togglePanel() {
+    const panel = document.getElementById('dev-panel');
+    const icon  = document.getElementById('toggle-icon');
+    const open  = panel.classList.toggle('open');
+    icon.textContent = open ? '✕' : '⚙';
+  }
+
+  // Function to add a new research tab dynamically
+  window.addResearchTab = function(id, label, num, htmlContent) {
+    const nav = document.getElementById('nav-tabs');
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.innerHTML = `<span class="tab-num">${num}</span>${label}<span class="tab-new-badge">NOVO</span>`;
+    btn.onclick = () => switchTab(id, btn);
+    nav.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.id = 'tab-' + id;
+    panel.className = 'tab-panel';
+    panel.innerHTML = htmlContent;
+    document.querySelector('main').appendChild(panel);
+
+    // Auto-navigate to new tab after a short delay
+    setTimeout(() => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      panel.classList.add('active');
+    }, 300);
+  }
+  let currentSlide = 0;
+const totalSlides = 4;
+
+function moveSlide(direction) {
+  currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+  updateCarousel();
+}
+
+function jumpToSlide(index) {
+  currentSlide = index;
+  updateCarousel();
+}
+
+function updateCarousel() {
+  const track = document.getElementById('carouselTrack');
+  const dots = document.querySelectorAll('.dot');
+  
+  track.style.transform = `translateX(-${currentSlide * 100}%)`;
+  
+  dots.forEach((dot, index) => {
+    dot.classList.toggle('active', index === currentSlide);
+  });
+}
+</script>
+<script>
+// ── CLIMATE DATA ──
+const labelsDaily = ["01/11","02/11","03/11","04/11","05/11","06/11","07/11","08/11","09/11","10/11","11/11","12/11","13/11","14/11","15/11","16/11","17/11","18/11","19/11","20/11","21/11","22/11","23/11","24/11","25/11","26/11","27/11","28/11","29/11","30/11","01/12","02/12","03/12","04/12","05/12","06/12","07/12","08/12","09/12","10/12","11/12","12/12","13/12","14/12","15/12","16/12","17/12","18/12","19/12","20/12","21/12","22/12","23/12","24/12","25/12","26/12","27/12","28/12","29/12","30/12","31/12","01/01","02/01","03/01","04/01","05/01","06/01","07/01","08/01","09/01","10/01","11/01","12/01","13/01","14/01","15/01","16/01","17/01","18/01","19/01","20/01","21/01","22/01","23/01","24/01","25/01","26/01","27/01","28/01","29/01","30/01","31/01","01/02","02/02","03/02","04/02","05/02","06/02","07/02","08/02","09/02","10/02","11/02","12/02","13/02","14/02","15/02","16/02","17/02","18/02","19/02","20/02","21/02","22/02","23/02","24/02","25/02"];
+const dataPrec  = [0.0,20.8,4.0,0.0,20.0,0.2,0.0,16.2,0.0,0.0,0.0,0.0,11.2,0.0,1.2,1.6,9.0,2.6,0.0,0.0,0.0,0.0,0.2,15.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.6,0.0,0.0,0.0,0.0,0.6,19.2,129.4,0.0,0.0,11.8,53.4,77.0,0.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,4.8,0.4,2.2,9.4,0.0,11.2,29.2,15.8,0.2,0.0,0.0,0.0,0.0,6.0,0.0,13.4,2.8,7.0,1.2,0.2,8.0,4.8,0.2,2.8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2.4,8.4,0.0,0.0,15.2,8.6,9.2,6.6,3.4,0.0,0.0,91.4,8.4,0.6,22.0,2.2,0.4,13.6,0.0,5.4,0.0,0.6,0.0,0.0,11.0,11.0,13.8,0.0,0.0];
+const dataTMin  = [19.1,17.7,18.9,20.8,18.9,17.8,14.9,18.6,15.1,13.6,14.0,19.4,19.0,20.0,18.8,18.6,18.5,16.7,14.0,16.4,16.7,22.4,18.1,16.9,15.0,16.3,16.4,14.9,21.8,23.7,23.5,21.0,20.7,19.7,17.4,20.6,23.0,20.6,20.4,20.4,18.2,19.4,19.0,18.6,20.8,20.8,17.4,15.6,17.6,20.3,20.4,22.7,23.9,24.7,23.2,22.8,21.6,22.5,20.8,21.8,21.4,20.7,20.9,20.5,20.5,17.8,16.8,19.2,21.4,21.5,19.9,19.6,19.4,18.5,19.6,19.7,19.8,19.8,21.1,20.0,17.5,15.4,15.8,15.6,17.3,17.4,18.7,20.0,19.2,20.1,20.2,20.9,20.5,20.4,20.6,20.4,20.2,19.9,20.6,17.4,18.5,20.1,21.2,21.0,21.5,21.2,21.4,22.7,23.8,22.3,21.1,21.8,20.2,20.5,20.0,20.7,22.9];
+const dataTMed  = [24.0,20.1,22.9,26.2,21.5,21.9,24.0,21.6,20.7,20.2,22.9,26.8,22.6,21.7,20.4,22.1,21.7,20.0,21.4,22.7,25.1,27.9,24.4,19.8,21.2,22.5,22.2,23.3,27.8,29.1,28.2,24.6,25.6,24.2,25.2,27.0,26.4,25.1,21.5,24.0,24.2,22.3,21.1,21.1,23.8,23.4,21.6,21.8,23.7,24.9,26.7,27.8,28.1,28.9,28.8,29.3,27.6,27.2,25.4,26.6,26.2,24.6,22.3,23.7,25.0,22.5,23.3,24.5,25.6,26.2,24.3,24.5,24.5,22.3,24.4,22.2,23.5,24.3,24.6,24.2,22.0,21.2,21.5,21.9,23.5,24.1,25.4,26.5,24.9,23.5,23.6,26.0,23.1,22.2,22.8,22.8,24.2,25.6,26.1,22.7,22.2,22.7,22.7,24.6,24.8,25.6,26.8,27.9,28.6,25.9,26.6,26.4,24.2,23.9,22.8,24.1,23.1];
+const dataTMax  = [30.4,23.1,28.6,32.1,25.3,28.5,32.2,26.1,27.4,26.9,30.7,34.2,28.1,23.2,22.4,26.9,24.0,25.1,28.1,28.9,33.0,34.0,31.2,24.4,28.1,28.6,28.5,30.6,34.4,35.0,34.0,30.9,31.8,30.9,34.0,34.2,33.5,29.5,23.4,28.6,29.8,24.3,24.4,23.6,28.6,27.2,26.8,27.6,30.4,30.4,32.4,32.9,32.6,34.3,35.3,35.9,34.6,32.6,33.0,32.8,33.6,31.3,26.4,29.0,31.9,29.8,29.8,30.5,31.2,32.4,32.4,31.2,31.0,29.3,31.3,29.1,30.7,30.5,31.2,30.6,28.4,28.9,29.0,28.7,31.3,32.1,32.1,33.5,31.9,31.4,29.4,32.6,28.9,26.2,26.8,28.2,29.7,31.9,33.3,30.2,28.2,27.5,27.3,30.0,30.9,33.7,33.5,34.5,34.3,32.1,32.3,33.6,31.1,30.9,28.0,29.3,23.4];
+const dataRad   = [228.1,69.0,217.8,289.4,61.0,266.3,325.8,125.0,342.0,343.6,321.1,329.6,221.7,103.3,79.5,139.5,101.6,197.7,338.7,335.4,336.9,293.8,243.5,175.2,328.9,325.3,335.2,324.8,315.6,300.2,215.3,197.6,229.8,227.1,298.9,283.8,200.0,192.6,47.2,280.2,329.7,62.9,91.9,57.9,219.7,145.5,279.1,238.0,236.2,231.1,302.1,252.0,256.0,289.2,289.2,286.7,280.6,236.2,260.8,254.8,293.1,273.5,104.1,225.1,292.2,305.5,300.0,234.9,274.7,243.9,174.8,267.7,248.3,218.2,294.6,168.2,257.3,257.5,246.0,307.6,331.5,311.1,251.3,285.1,309.1,275.9,240.6,299.5,307.5,233.6,223.7,306.9,132.5,134.6,151.2,161.5,200.6,320.9,275.9,202.0,185.6,213.2,136.0,241.9,205.0,252.2,286.8,257.3,278.2,213.4,247.0,240.7,155.4,227.6,141.9,188.0,0.0];
+const dataUmid  = [75.9,95.8,87.8,76.0,93.8,82.8,65.6,89.5,73.1,60.7,60.3,54.4,85.5,87.3,89.6,90.9,95.2,79.3,55.2,53.5,52.4,44.4,72.3,92.1,71.9,59.3,51.9,58.0,43.3,38.5,52.4,76.7,74.1,73.2,61.2,59.6,67.5,76.5,99.9,72.5,66.0,87.6,98.2,99.8,93.7,92.3,80.6,77.1,81.8,80.1,70.4,60.4,54.4,52.0,60.3,59.9,72.8,75.3,82.9,78.2,82.3,87.9,98.4,90.3,80.1,78.3,74.2,77.6,76.4,72.3,82.8,83.8,83.6,90.0,78.7,93.2,89.3,85.7,87.6,81.6,68.5,71.4,70.3,69.4,71.4,69.7,72.3,68.2,77.6,86.1,87.6,75.4,93.8,96.6,96.0,95.7,87.0,72.9,73.1,88.7,90.2,94.5,97.4,86.5,84.9,80.6,74.9,66.7,62.0,76.9,73.6,74.0,84.6,88.0,90.8,89.2,96.6];
+
+const labelsMonthly = ['Nov/2025','Dez/2025','Jan/2026','Fev/2026'];
+const dataMonthPrec = [102.2, 320.2, 102.4, 223.4];
+const dataMonthEto  = [139.0, 140.3, 147.7, 94.4];
+const dataMonthBal  = [-36.8, 179.9, -45.3, 129.0];
+
+const GRID   = 'rgba(31,46,36,0.5)';
+const TICK   = '#6b8f77';
+const GREEN  = '#3ddc84';
+const YELLOW = '#f5c842';
+const RED    = '#e05c5c';
+const BLUE   = '#5ca8e0';
+const ORANGE = '#f59342';
+
+Chart.defaults.color = TICK;
+Chart.defaults.font.family = "'Space Mono', monospace";
+Chart.defaults.font.size   = 10;
+
+const baseOpts = (yLabel, extra={}) => ({
+  responsive: true,
+  animation: { duration: 600 },
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { labels: { color: TICK, boxWidth: 12, padding: 16 } },
+    tooltip: {
+      backgroundColor: '#161e19',
+      borderColor: '#1f2e24',
+      borderWidth: 1,
+      titleColor: GREEN,
+      bodyColor: '#d4e8da',
+      padding: 10,
+    }
+  },
+  scales: {
+    x: {
+      grid: { color: GRID },
+      ticks: { color: TICK, maxTicksLimit: 18, maxRotation: 45 }
+    },
+    y: {
+      grid: { color: GRID },
+      ticks: { color: TICK },
+      title: { display: true, text: yLabel, color: TICK }
+    },
+    ...extra
+  }
+});
+
+// ── CHART 1: Precipitação ──
+new Chart(document.getElementById('chartPrec'), {
+  type: 'bar',
+  data: {
+    labels: labelsDaily,
+    datasets: [{
+      label: 'Precipitação (mm)',
+      data: dataPrec,
+      backgroundColor: dataPrec.map(v => v >= 50 ? RED : v >= 20 ? YELLOW : BLUE),
+      borderRadius: 2,
+    }]
+  },
+  options: {
+    ...baseOpts('mm/dia'),
+    plugins: {
+      ...baseOpts('mm').plugins,
+      annotation: {}
+    }
+  }
+});
+
+// ── CHART 2: Temperatura ──
+new Chart(document.getElementById('chartTemp'), {
+  type: 'line',
+  data: {
+    labels: labelsDaily,
+    datasets: [
+      {
+        label: 'T. Máxima (°C)',
+        data: dataTMax,
+        borderColor: RED,
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+      },
+      {
+        label: 'T. Média (°C)',
+        data: dataTMed,
+        borderColor: YELLOW,
+        backgroundColor: 'rgba(245,200,66,0.08)',
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.3,
+      },
+      {
+        label: 'T. Mínima (°C)',
+        data: dataTMin,
+        borderColor: BLUE,
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+      }
+    ]
+  },
+  options: baseOpts('°C')
+});
+
+// ── CHART 3: Radiação + Umidade ──
+new Chart(document.getElementById('chartRadUmid'), {
+  type: 'line',
+  data: {
+    labels: labelsDaily,
+    datasets: [
+      {
+        label: 'Radiação Solar (W/m²)',
+        data: dataRad,
+        borderColor: ORANGE,
+        backgroundColor: 'rgba(245,147,66,0.08)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        tension: 0.3,
+        yAxisID: 'yRad',
+      },
+      {
+        label: 'Umidade Rel. Média (%)',
+        data: dataUmid,
+        borderColor: BLUE,
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        yAxisID: 'yUmid',
+      }
+    ]
+  },
+  options: {
+    ...baseOpts(''),
+    scales: {
+      x: { grid: { color: GRID }, ticks: { color: TICK, maxTicksLimit: 18, maxRotation: 45 } },
+      yRad:  { position: 'left',  grid: { color: GRID }, ticks: { color: ORANGE }, title: { display: true, text: 'W/m²', color: ORANGE } },
+      yUmid: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: BLUE }, title: { display: true, text: '%', color: BLUE }, min: 0, max: 100 }
+    }
+  }
+});
+
+// ── CHART 4: Balanço Hídrico Mensal ──
+new Chart(document.getElementById('chartBalanco'), {
+  type: 'bar',
+  data: {
+    labels: labelsMonthly,
+    datasets: [
+      {
+        label: 'Precipitação (mm)',
+        data: dataMonthPrec,
+        backgroundColor: 'rgba(92,168,224,0.7)',
+        borderRadius: 4,
+        order: 2,
+      },
+      {
+        label: 'Evapotranspiração (mm)',
+        data: dataMonthEto,
+        backgroundColor: 'rgba(245,200,66,0.7)',
+        borderRadius: 4,
+        order: 2,
+      },
+      {
+        label: 'Balanço (Prec − ETo)',
+        data: dataMonthBal,
+        type: 'line',
+        borderColor: GREEN,
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
+        pointBackgroundColor: dataMonthBal.map(v => v >= 0 ? GREEN : RED),
+        pointRadius: 6,
+        tension: 0.2,
+        order: 1,
+        yAxisID: 'yBal',
+      }
+    ]
+  },
+  options: {
+    ...baseOpts('mm'),
+    scales: {
+      x: { grid: { color: GRID }, ticks: { color: TICK } },
+      y:    { grid: { color: GRID }, ticks: { color: TICK }, title: { display: true, text: 'mm', color: TICK } },
+      yBal: {
+        position: 'right',
+        grid: { drawOnChartArea: false },
+        ticks: { color: GREEN },
+        title: { display: true, text: 'Balanço (mm)', color: GREEN },
+      }
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// NDVI CHARTS
+// ═══════════════════════════════════════════════════════
+
+const ndviLabels    = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","20/02/26"];
+const ndviSilConv   = [0.5557,0.568,0.5238,0.4317,0.4396,0.424,0.392,0.398,0.3819,0.3505,0.2073,0.2636,0.4255,0.3688,0.4119,0.4184,0.4169,0.5207,0.465,0.3942,0.6242,0.6965,0.4418,0.8273,0.8071,0.7477,0.5073,0.785];
+const ndviSil40     = [0.5814,0.5934,0.5494,0.4422,0.4496,0.4265,0.3979,0.4015,0.3837,0.3819,0.2812,0.2809,0.4287,0.3296,0.4129,0.4225,0.4248,0.5121,0.4723,0.4254,0.667,0.7367,0.4595,0.8388,0.8188,0.7401,0.6844,0.7809];
+const ndviGraoConv  = [0.4655,0.4709,0.4223,0.3374,0.3389,0.3162,0.2944,0.2946,0.2823,0.3006,0.2326,0.2335,0.3433,0.4392,0.3605,0.3685,0.3872,0.4559,0.4298,0.3798,0.6016,0.6717,0.2496,0.7625,0.7336,0.6167,0.662,0.6908];
+const ndviGrao40    = [0.4324,0.436,0.3928,0.3158,0.3129,0.2858,0.2682,0.2711,0.2589,0.2757,0.269,0.2204,0.3392,0.3623,0.3219,0.3199,0.331,0.3964,0.3772,0.447,0.5723,0.6554,0.2874,0.7547,0.7193,0.5699,0.5731,0.6692];
+
+const silConvDates  = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","20/02/26"];
+const silConvMeans  = [0.5557,0.568,0.5238,0.4317,0.4396,0.424,0.392,0.398,0.3819,0.3505,0.2073,0.2636,0.4255,0.3688,0.4119,0.4184,0.4169,0.5207,0.465,0.3942,0.6242,0.6965,0.6878,0.4418,0.8273,0.8071,0.7477,0.5073,0.785];
+const silConvStds   = [0.1364,0.1378,0.1369,0.1226,0.132,0.1357,0.1332,0.1394,0.1348,0.1568,0.1815,0.1281,0.1526,0.2029,0.2044,0.2037,0.2114,0.2147,0.1806,0.1506,0.157,0.1435,0.1952,0.1079,0.1372,0.1246,0.1255,0.2768,0.1278];
+
+const sil40Dates    = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const sil40Means    = [0.5814,0.5934,0.5494,0.4422,0.4496,0.4265,0.3979,0.4015,0.3837,0.3819,0.2812,0.2809,0.4287,0.3296,0.4129,0.4225,0.4248,0.5121,0.4723,0.4254,0.667,0.7367,0.7696,0.4595,0.8388,0.8188,0.7401,0.6844,0.3892,0.7809];
+const sil40Stds     = [0.1578,0.1606,0.159,0.1461,0.1567,0.1662,0.1649,0.1741,0.1689,0.1885,0.1621,0.1687,0.1837,0.2012,0.2306,0.2346,0.2415,0.2695,0.2,0.2341,0.2149,0.1715,0.1669,0.1291,0.1704,0.1543,0.1714,0.235,0.2523,0.1564];
+
+const graoCDates    = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const graoCMeans    = [0.4655,0.4709,0.4223,0.3374,0.3389,0.3162,0.2944,0.2946,0.2823,0.3006,0.2326,0.2335,0.3433,0.4392,0.3605,0.3685,0.3872,0.4559,0.4298,0.3798,0.6016,0.6717,0.2496,0.7625,0.7336,0.6167,0.662,0.571,0.6908];
+const graoCStds     = [0.1307,0.1305,0.1243,0.1078,0.1124,0.1129,0.1066,0.1083,0.1017,0.1073,0.093,0.0575,0.1127,0.1641,0.1926,0.2007,0.2143,0.2237,0.1804,0.1627,0.1583,0.1492,0.0749,0.1609,0.1401,0.1663,0.1322,0.2672,0.1429];
+
+const grao40Dates   = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","15/02/26","20/02/26"];
+const grao40Means   = [0.4324,0.436,0.3928,0.3158,0.3129,0.2858,0.2682,0.2711,0.2589,0.2757,0.269,0.2204,0.3392,0.3623,0.3219,0.3199,0.331,0.3964,0.3772,0.447,0.5723,0.6554,0.2406,0.2874,0.7547,0.7193,0.5699,0.5731,0.5533,0.5749,0.6692];
+const grao40Stds    = [0.1291,0.1271,0.1173,0.0973,0.1001,0.0958,0.089,0.0891,0.0834,0.0873,0.0929,0.0656,0.1103,0.1815,0.1743,0.1804,0.1901,0.2142,0.1663,0.1482,0.1581,0.1667,0.2212,0.0827,0.2002,0.1735,0.1912,0.199,0.2353,0.1102,0.1727];
+
+const ndviOpts = () => ({
+  responsive: true,
+  animation: { duration: 600 },
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { labels: { color: TICK, boxWidth: 12, padding: 14 } },
+    tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:10 }
+  },
+  scales: {
+    x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:14, maxRotation:45} },
+    y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1, title:{display:true, text:'NDVI', color:TICK} }
+  }
+});
+
+const ndviOptsSm = () => ({
+  responsive: true,
+  animation: { duration: 600 },
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { labels: { color: TICK, boxWidth: 10, padding: 10 } },
+    tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:8 }
+  },
+  scales: {
+    x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:10, maxRotation:45} },
+    y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1 }
+  }
+});
+
+// Chart 1 — Série comparativa (datas comuns)
+new Chart(document.getElementById('chartNdviSerie'), {
+  type: 'line',
+  data: {
+    labels: ndviLabels,
+    datasets: [
+      { label:'Silagem 4.0',   data:ndviSil40,    borderColor:GREEN,  borderWidth:2.5, pointRadius:4, fill:false, tension:0.3, pointBackgroundColor:GREEN },
+      { label:'Silagem Conv.', data:ndviSilConv,  borderColor:BLUE,   borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:BLUE },
+      { label:'Grão Conv.',    data:ndviGraoConv, borderColor:YELLOW, borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:YELLOW, borderDash:[5,3] },
+      { label:'Grão 4.0',     data:ndviGrao40,   borderColor:ORANGE, borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:ORANGE, borderDash:[5,3] },
+    ]
+  },
+  options: ndviOpts()
+});
+
+// Chart 2a — Silagem individual
+new Chart(document.getElementById('chartNdviSilagem'), {
+  type: 'line',
+  data: {
+    labels: sil40Dates,
+    datasets: [
+      { label:'Silagem 4.0',   data:sil40Means,   borderColor:GREEN, borderWidth:2.5, pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:GREEN },
+      { label:'Silagem Conv.', data:silConvMeans, borderColor:BLUE,  borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:BLUE },
+    ]
+  },
+  options: ndviOptsSm()
+});
+
+// Chart 2b — Grão individual
+new Chart(document.getElementById('chartNdviGrao'), {
+  type: 'line',
+  data: {
+    labels: grao40Dates,
+    datasets: [
+      { label:'Grão 4.0',   data:grao40Means, borderColor:ORANGE, borderWidth:2.5, pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:ORANGE },
+      { label:'Grão Conv.', data:graoCMeans,  borderColor:YELLOW, borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:YELLOW },
+    ]
+  },
+  options: ndviOptsSm()
+});
+
+// Chart 3 — Classes de cobertura (stacked bar)
+new Chart(document.getElementById('chartCobertura'), {
+  type: 'bar',
+  data: {
+    labels: ['Silagem 4.0','Silagem Conv.','Grão Conv.','Grão 4.0'],
+    datasets: [
+      { label:'Água',        data:[1.46,0.01,0.00,0.13], backgroundColor:'#2c4ea0' },
+      { label:'Solo exposto',data:[7.69,7.66,13.10,16.55], backgroundColor:'#8b7355' },
+      { label:'Veg. Baixa', data:[29.26,31.86,38.68,39.28], backgroundColor:'#8db87a' },
+      { label:'Veg. Mod.',  data:[22.21,26.96,21.25,20.41], backgroundColor:'#4d9e5e' },
+      { label:'Veg. Alta',  data:[20.41,18.64,20.30,18.32], backgroundColor:'#2a7a3c' },
+      { label:'Veg. Densa', data:[18.97,14.88,6.66,5.31],  backgroundColor:GREEN },
+    ]
+  },
+  options: {
+    responsive:true, animation:{duration:600},
+    plugins: {
+      legend:{labels:{color:TICK,boxWidth:12,padding:12}},
+      tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}
+    },
+    scales: {
+      x:{ stacked:true, grid:{color:GRID}, ticks:{color:TICK} },
+      y:{ stacked:true, grid:{color:GRID}, max:100,
+          ticks:{color:TICK, callback:v=>v+'%'},
+          title:{display:true,text:'% pixels',color:TICK} }
+    }
+  }
+});
+
+// Chart 4 — Heterogeneidade b1_std
+new Chart(document.getElementById('chartStd'), {
+  type: 'line',
+  data: {
+    labels: sil40Dates,
+    datasets: [
+      { label:'Silagem 4.0',   data:sil40Stds,   borderColor:GREEN,  borderWidth:2, pointRadius:2, fill:false, tension:0.3 },
+      { label:'Silagem Conv.', data:silConvStds, borderColor:BLUE,   borderWidth:2, pointRadius:2, fill:false, tension:0.3 },
+      { label:'Grão Conv.',    data:graoCStds,   borderColor:YELLOW, borderWidth:2, pointRadius:2, fill:false, tension:0.3, borderDash:[4,2] },
+      { label:'Grão 4.0',     data:grao40Stds,  borderColor:ORANGE, borderWidth:2, pointRadius:2, fill:false, tension:0.3, borderDash:[4,2] },
+    ]
+  },
+  options: {
+    responsive:true, animation:{duration:600},
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{labels:{color:TICK,boxWidth:12,padding:14}},
+      tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}
+    },
+    scales:{
+      x:{grid:{color:GRID},ticks:{color:TICK,maxTicksLimit:14,maxRotation:45}},
+      y:{grid:{color:GRID},ticks:{color:TICK},min:0,
+         title:{display:true,text:'Desvio Padrão NDVI',color:TICK}}
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// CORRELAÇÃO CHARTS
+// ═══════════════════════════════════════════════════════
+
+// Data per talhão with climate overlay
+const sil40d  = ["04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const sil40n  = [0.3296,0.4129,0.4225,0.4248,0.5121,0.4723,0.4254,0.667,0.7367,0.7696,0.4595,0.8388,0.8188,0.7401,0.6844,0.3892,0.7809];
+const sil40u  = [76.0,65.6,54.4,44.4,92.1,51.9,80.6,72.8,87.9,74.2,83.8,89.3,71.4,72.3,75.4,87.0,74.0];
+
+const silcd   = ["04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","20/02/26"];
+const silcn   = [0.3688,0.4119,0.4184,0.4169,0.5207,0.465,0.3942,0.6242,0.6965,0.6878,0.4418,0.8273,0.8071,0.7477,0.5073,0.785];
+const silcu   = [76.0,65.6,54.4,44.4,92.1,51.9,80.6,72.8,87.9,74.2,83.8,89.3,71.4,72.3,75.4,74.0];
+
+const g40d    = ["04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","15/02/26","20/02/26"];
+const g40n    = [0.3623,0.3219,0.3199,0.331,0.3964,0.3772,0.447,0.5723,0.6554,0.2406,0.2874,0.7547,0.7193,0.5699,0.5731,0.5533,0.5749,0.6692];
+const g40u    = [76.0,65.6,54.4,44.4,92.1,51.9,80.6,72.8,87.9,74.2,83.8,89.3,71.4,72.3,75.4,87.0,74.9,74.0];
+
+const gcd     = ["04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const gcn     = [0.4392,0.3605,0.3685,0.3872,0.4559,0.4298,0.3798,0.6016,0.6717,0.2496,0.7625,0.7336,0.6167,0.662,0.571,0.6908];
+const gcu     = [76.0,65.6,54.4,44.4,92.1,51.9,80.6,72.8,87.9,83.8,89.3,71.4,72.3,75.4,87.0,74.0];
+
+// Common prec14 and rad for overlay chart (using sil40 dates as base)
+const corrDates = ["04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const corrNdviMean = [0.375,0.3768,0.3823,0.39,0.4713,0.4361,0.4116,0.6163,0.6901,0.566,0.3596,0.7958,0.7697,0.6686,0.6067,0.5045,0.7315];
+const corrPrec14   = [24.8,45.0,61.2,25.6,41.0,29.8,291.6,82.4,57.2,73.2,88.0,43.6,46.4,17.2,13.6,53.8,144.6];
+const corrRad      = [289.4,325.8,329.6,293.8,175.2,335.2,279.1,280.6,273.5,300.0,267.7,257.3,311.1,240.6,306.9,200.6,240.7];
+
+const corrOpts = (yLabel) => ({
+  responsive: true,
+  animation: { duration: 600 },
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { labels: { color: TICK, boxWidth: 12, padding: 14 } },
+    tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:10 }
+  },
+  scales: {
+    x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:12, maxRotation:45} },
+    yNdvi: { position:'left',  grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1, title:{display:true,text:'NDVI',color:TICK} },
+    yClim: { position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#aaaaaa'}, title:{display:true,text:yLabel,color:'#aaaaaa'} }
+  }
+});
+
+// Chart 1: Silagem NDVI × Umidade
+new Chart(document.getElementById('chartCorrSilagemUmid'), {
+  type: 'line',
+  data: {
+    labels: sil40d,
+    datasets: [
+      { label:'NDVI Silagem 4.0',   data:sil40n, borderColor:GREEN,  borderWidth:2.5, pointRadius:4, fill:false, tension:0.3, yAxisID:'yNdvi', pointBackgroundColor:GREEN },
+      { label:'NDVI Silagem Conv.', data:silcn,  borderColor:BLUE,   borderWidth:2,   pointRadius:3, fill:false, tension:0.3, yAxisID:'yNdvi', pointBackgroundColor:BLUE },
+      { label:'Umidade Rel. (%)',   data:sil40u, borderColor:'rgba(200,200,200,0.6)', borderWidth:1.5, pointRadius:0, fill:false, tension:0.3, yAxisID:'yClim', borderDash:[3,3] },
+    ]
+  },
+  options: corrOpts('%')
+});
+
+// Chart 2: Grão NDVI × Umidade
+new Chart(document.getElementById('chartCorrGraoUmid'), {
+  type: 'line',
+  data: {
+    labels: g40d,
+    datasets: [
+      { label:'NDVI Grão 4.0',   data:g40n, borderColor:ORANGE, borderWidth:2.5, pointRadius:4, fill:false, tension:0.3, yAxisID:'yNdvi', pointBackgroundColor:ORANGE },
+      { label:'NDVI Grão Conv.', data:gcn,  borderColor:YELLOW, borderWidth:2,   pointRadius:3, fill:false, tension:0.3, yAxisID:'yNdvi', pointBackgroundColor:YELLOW },
+      { label:'Umidade Rel. (%)',data:g40u, borderColor:'rgba(200,200,200,0.6)', borderWidth:1.5, pointRadius:0, fill:false, tension:0.3, yAxisID:'yClim', borderDash:[3,3] },
+    ]
+  },
+  options: corrOpts('%')
+});
+
+// Chart 3: NDVI médio × Prec14d × Radiação
+new Chart(document.getElementById('chartCorrPrec'), {
+  type: 'line',
+  data: {
+    labels: corrDates,
+    datasets: [
+      { label:'NDVI médio (todos talhões)', data:corrNdviMean, borderColor:GREEN,  borderWidth:2.5, pointRadius:4, fill:false, tension:0.3, yAxisID:'yNdvi', pointBackgroundColor:GREEN },
+      { label:'Prec. acum. 14d (mm)',       data:corrPrec14,  borderColor:BLUE,   borderWidth:1.5, pointRadius:2, fill:false, tension:0.2, yAxisID:'yClim', borderDash:[5,3] },
+      { label:'Radiação Solar (W/m²)',      data:corrRad,     borderColor:ORANGE, borderWidth:1.5, pointRadius:0, fill:false, tension:0.3, yAxisID:'yClim2', borderDash:[2,4] },
+    ]
+  },
+  options: {
+    responsive: true,
+    animation: { duration: 600 },
+    interaction: { mode:'index', intersect:false },
+    plugins: {
+      legend: { labels:{color:TICK, boxWidth:12, padding:14} },
+      tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:10 }
+    },
+    scales: {
+      x:      { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:12, maxRotation:45} },
+      yNdvi:  { position:'left',   grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1, title:{display:true,text:'NDVI',color:TICK} },
+      yClim:  { position:'right',  grid:{drawOnChartArea:false}, ticks:{color:BLUE},   title:{display:true,text:'mm',color:BLUE} },
+      yClim2: { position:'right',  grid:{drawOnChartArea:false}, ticks:{color:ORANGE}, display:false }
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// HETEROGENEIDADE CHARTS
+// ═══════════════════════════════════════════════════════
+
+const hs40d = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const hs40s = [0.1578,0.1606,0.159,0.1461,0.1567,0.1662,0.1649,0.1741,0.1689,0.1885,0.1621,0.1687,0.1837,0.2012,0.2306,0.2346,0.2415,0.2695,0.2,0.2341,0.2149,0.1715,0.1669,0.1291,0.1704,0.1543,0.1714,0.235,0.2523,0.1564];
+const hs40cv= [0.2713,0.2706,0.2895,0.3304,0.3486,0.3896,0.4144,0.4337,0.4402,0.4935,0.5763,0.6004,0.4285,0.6103,0.5586,0.5552,0.5685,0.5263,0.4235,0.5503,0.3222,0.2328,0.2168,0.281,0.2032,0.1885,0.2315,0.3434,0.6482,0.2002];
+
+const hscd  = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","20/02/26"];
+const hscds = [0.1364,0.1378,0.1369,0.1226,0.132,0.1357,0.1332,0.1394,0.1348,0.1568,0.1815,0.1281,0.1526,0.2029,0.2044,0.2037,0.2114,0.2147,0.1806,0.1506,0.157,0.1435,0.1952,0.1079,0.1372,0.1246,0.1255,0.2768,0.1278];
+const hscdcv= [0.2454,0.2426,0.2614,0.284,0.3002,0.32,0.3398,0.3503,0.3531,0.4473,0.8757,0.486,0.3587,0.55,0.4963,0.487,0.5072,0.4123,0.3883,0.3821,0.2515,0.206,0.2838,0.2442,0.1658,0.1544,0.1679,0.5456,0.1628];
+
+const hg40d = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","15/02/26","20/02/26"];
+const hg40s = [0.1291,0.1271,0.1173,0.0973,0.1001,0.0958,0.089,0.0891,0.0834,0.0873,0.0929,0.0656,0.1103,0.1815,0.1743,0.1804,0.1901,0.2142,0.1663,0.1482,0.1581,0.1667,0.2212,0.0827,0.2002,0.1735,0.1912,0.199,0.2353,0.1102,0.1727];
+const hg40cv= [0.2986,0.2914,0.2985,0.3081,0.32,0.3354,0.3319,0.3284,0.322,0.3166,0.3453,0.2977,0.3251,0.5009,0.5415,0.564,0.5743,0.5404,0.441,0.3314,0.2763,0.2543,0.9193,0.2879,0.2653,0.2412,0.3355,0.3473,0.4252,0.1916,0.258];
+
+const hgcd  = ["06/08/25","09/08/25","14/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","03/10/25","23/10/25","04/11/25","07/11/25","12/11/25","22/11/25","24/11/25","27/11/25","17/12/25","27/12/25","01/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","20/02/26"];
+const hgcds = [0.1307,0.1305,0.1243,0.1078,0.1124,0.1129,0.1066,0.1083,0.1017,0.1073,0.093,0.0575,0.1127,0.1641,0.1926,0.2007,0.2143,0.2237,0.1804,0.1627,0.1583,0.1492,0.0749,0.1609,0.1401,0.1663,0.1322,0.2672,0.1429];
+const hgcdcv= [0.2809,0.2772,0.2944,0.3194,0.3317,0.3569,0.362,0.3677,0.3602,0.3569,0.4001,0.2464,0.3284,0.3737,0.5341,0.5448,0.5534,0.4906,0.4198,0.4285,0.2631,0.2221,0.2999,0.211,0.191,0.2697,0.1998,0.468,0.2068];
+
+const hOpts = (yLabel, yMax) => ({
+  responsive: true, animation:{duration:600},
+  interaction:{mode:'index',intersect:false},
+  plugins:{
+    legend:{labels:{color:TICK,boxWidth:12,padding:14}},
+    tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}
+  },
+  scales:{
+    x:{grid:{color:GRID},ticks:{color:TICK,maxTicksLimit:14,maxRotation:45}},
+    y:{grid:{color:GRID},ticks:{color:TICK},min:0,max:yMax,title:{display:true,text:yLabel,color:TICK}}
+  }
+});
+
+// Chart 1 — STD temporal
+new Chart(document.getElementById('chartHeteroStd'),{
+  type:'line',
+  data:{
+    labels: hs40d,
+    datasets:[
+      {label:'Silagem 4.0',  data:hs40s, borderColor:GREEN,  borderWidth:2.5,pointRadius:3,fill:false,tension:0.3},
+      {label:'Silagem Conv.',data:hscds, borderColor:BLUE,   borderWidth:2,  pointRadius:3,fill:false,tension:0.3},
+      {label:'Grão 4.0',    data:hg40s, borderColor:ORANGE, borderWidth:2,  pointRadius:3,fill:false,tension:0.3,borderDash:[5,3]},
+      {label:'Grão Conv.',  data:hgcds, borderColor:YELLOW, borderWidth:2,  pointRadius:3,fill:false,tension:0.3,borderDash:[5,3]},
+    ]
+  },
+  options: hOpts('b1_std', 0.35)
+});
+
+// Chart 2 — CV temporal
+new Chart(document.getElementById('chartHeteroCV'),{
+  type:'line',
+  data:{
+    labels: hs40d,
+    datasets:[
+      {label:'Silagem 4.0',  data:hs40cv, borderColor:GREEN,  borderWidth:2.5,pointRadius:3,fill:false,tension:0.3},
+      {label:'Silagem Conv.',data:hscdcv, borderColor:BLUE,   borderWidth:2,  pointRadius:3,fill:false,tension:0.3},
+      {label:'Grão 4.0',    data:hg40cv, borderColor:ORANGE, borderWidth:2,  pointRadius:3,fill:false,tension:0.3,borderDash:[5,3]},
+      {label:'Grão Conv.',  data:hgcdcv, borderColor:YELLOW, borderWidth:2,  pointRadius:3,fill:false,tension:0.3,borderDash:[5,3]},
+    ]
+  },
+  options: hOpts('CV (std/média)', 1.0)
+});
+
+// Chart 3 — STD médio mensal (grouped bar)
+new Chart(document.getElementById('chartHeteroMensal'),{
+  type:'bar',
+  data:{
+    labels:['Ago/25','Set/25','Out/25','Nov/25','Dez/25','Jan/26','Fev/26'],
+    datasets:[
+      {label:'Silagem 4.0',  data:[0.1560,0.1708,0.1762,0.2296,0.2245,0.1712,0.2043], backgroundColor:'rgba(61,220,132,0.7)',  borderRadius:3},
+      {label:'Silagem Conv.',data:[0.1331,0.1469,0.1404,0.2030,0.1538,0.1587,0.1278], backgroundColor:'rgba(92,168,224,0.7)',  borderRadius:3},
+      {label:'Grão 4.0',    data:[0.1142,0.0896,0.0879,0.1845,0.1532,0.1764,0.1727], backgroundColor:'rgba(245,147,66,0.7)',  borderRadius:3},
+      {label:'Grão Conv.',  data:[0.1212,0.1050,0.0851,0.1960,0.1605,0.1373,0.2050], backgroundColor:'rgba(245,200,66,0.7)',  borderRadius:3},
+    ]
+  },
+  options:{
+    responsive:true, animation:{duration:600},
+    plugins:{legend:{labels:{color:TICK,boxWidth:12,padding:12}},tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}},
+    scales:{
+      x:{grid:{color:GRID},ticks:{color:TICK}},
+      y:{grid:{color:GRID},ticks:{color:TICK},min:0,title:{display:true,text:'STD médio',color:TICK}}
+    }
+  }
+});
+
+// Chart 4 — Classes por fase (grouped bar — Silagem 4.0 vs Grão 4.0)
+new Chart(document.getElementById('chartHeteroFase'),{
+  type:'bar',
+  data:{
+    labels:['Pré-plantio\nSil 4.0','Pré-plantio\nGrão 4.0','Estabelecimento\nSil 4.0','Estabelecimento\nGrão 4.0','Crescimento/Pico\nSil 4.0','Crescimento/Pico\nGrão 4.0','Pós-pico\nSil 4.0','Pós-pico\nGrão 4.0'],
+    datasets:[
+      {label:'Solo',       data:[6.7,16.8,13.2,22.3,1.3,14.4,14.3,5.3],  backgroundColor:'#8b7355',borderRadius:2},
+      {label:'Veg. Baixa', data:[40.8,61.0,33.0,31.8,7.6,20.2,15.4,9.7], backgroundColor:'#8db87a',borderRadius:2},
+      {label:'Veg. Mod.',  data:[31.3,20.3,20.3,27.7,11.4,11.2,8.5,22.9], backgroundColor:'#4d9e5e',borderRadius:2},
+      {label:'Veg. Alta',  data:[15.6,1.7,19.6,16.9,28.0,36.0,28.1,52.9], backgroundColor:'#2a7a3c',borderRadius:2},
+      {label:'Veg. Densa', data:[3.9,0.1,12.4,1.2,50.4,18.1,32.9,9.2],   backgroundColor:GREEN,borderRadius:2},
+    ]
+  },
+  options:{
+    responsive:true, animation:{duration:600},
+    plugins:{legend:{labels:{color:TICK,boxWidth:12,padding:12}},tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}},
+    scales:{
+      x:{stacked:true,grid:{color:GRID},ticks:{color:TICK,maxRotation:30}},
+      y:{stacked:true,grid:{color:GRID},max:100,ticks:{color:TICK,callback:v=>v+'%'},title:{display:true,text:'% pixels',color:TICK}}
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// GAP-FILLING CHART — Silagem 4.0
+// ═══════════════════════════════════════════════════════
+
+const gfDates  = ["04/08/25","06/08/25","09/08/25","14/08/25","19/08/25","24/08/25","26/08/25","29/08/25","03/09/25","08/09/25","13/09/25","15/09/25","18/09/25","23/09/25","28/09/25","03/10/25","08/10/25","13/10/25","15/10/25","18/10/25","23/10/25","28/10/25","02/11/25","04/11/25","07/11/25","12/11/25","17/11/25","22/11/25","24/11/25","27/11/25","02/12/25","07/12/25","12/12/25","14/12/25","17/12/25","27/12/25","01/01/26","03/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26","05/02/26","10/02/26","15/02/26","20/02/26","25/02/26"];
+const gfOrig   = [null,0.5814,0.5934,0.5494,null,null,0.4422,0.4496,0.4265,0.3979,0.4015,0.3837,0.3819,0.2812,null,0.2809,null,null,null,null,0.4287,null,null,0.3296,0.4129,0.4225,null,0.4248,0.5121,0.4723,null,null,null,null,0.4254,0.667,0.7367,null,0.7696,0.4595,0.8388,0.8188,0.7401,0.6844,0.3892,null,null,0.7809,null];
+const gfFfill  = [null,0.5814,0.5934,0.5494,0.5494,0.5494,0.4422,0.4496,0.4265,0.3979,0.4015,0.3837,0.3819,0.2812,0.2812,0.2809,0.2809,0.2809,0.2809,0.2809,0.4287,0.4287,0.4287,0.3296,0.4129,0.4225,0.4225,0.4248,0.5121,0.4723,0.4723,0.4723,0.4723,0.4723,0.4254,0.667,0.7367,0.7367,0.7696,0.4595,0.8388,0.8188,0.7401,0.6844,0.3892,0.3892,0.3892,0.7809,0.7809];
+const gfMean3  = [null,0.5814,0.5934,0.5494,0.5748,0.5748,0.4422,0.4496,0.4265,0.3979,0.4015,0.3837,0.3819,0.2812,0.3489,0.2809,0.3147,0.3147,0.3147,0.3147,0.4287,0.3303,0.3303,0.3296,0.4129,0.4225,0.3883,0.4248,0.5121,0.4723,0.4698,0.4698,0.4698,0.4698,0.4254,0.667,0.7367,0.6097,0.7696,0.4595,0.8388,0.8188,0.7401,0.6844,0.3892,0.6045,0.6045,0.7809,0.6181];
+const gfInterp = [null,0.5814,0.5934,0.5494,0.5137,0.478,0.4422,0.4496,0.4265,0.3979,0.4015,0.3837,0.3819,0.2812,0.2811,0.2809,0.3105,0.34,0.3696,0.3991,0.4287,0.3957,0.3626,0.3296,0.4129,0.4225,0.4237,0.4248,0.5121,0.4723,0.4629,0.4535,0.4442,0.4348,0.4254,0.667,0.7367,0.7532,0.7696,0.4595,0.8388,0.8188,0.7401,0.6844,0.3892,0.5197,0.6503,0.7809,0.7809];
+const gfCloud  = [1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,1,1,1,0,1,1,0,0,0,1,0,0,0,1,1,1,1,0,0,0,1,0,0,0,0,0,0,0,1,1,0,1];
+
+// Background plugin to shade cloudy regions
+const cloudShadePlugin = {
+  id: 'cloudShade',
+  beforeDraw(chart) {
+    const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+    if (!x) return;
+    gfCloud.forEach((c, i) => {
+      if (c === 1) {
+        const xPos = x.getPixelForValue(i);
+        const w = x.getPixelForValue(1) - x.getPixelForValue(0);
+        ctx.save();
+        ctx.fillStyle = 'rgba(150,150,150,0.12)';
+        ctx.fillRect(xPos - w/2, top, w, bottom - top);
+        ctx.restore();
+      }
+    });
+  }
+};
+
+new Chart(document.getElementById('chartGapFilling'), {
+  type: 'line',
+  plugins: [cloudShadePlugin],
+  data: {
+    labels: gfDates,
+    datasets: [
+      {
+        label: 'NDVI Original (válido)',
+        data: gfOrig,
+        borderColor: 'rgba(255,255,255,0.5)',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        borderWidth: 0,
+        pointRadius: gfCloud.map(c => c === 0 ? 5 : 0),
+        pointHoverRadius: 6,
+        showLine: false,
+        order: 0,
+      },
+      {
+        label: 'M1 — Forward Fill',
+        data: gfFfill,
+        borderColor: BLUE,
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [5, 3],
+        pointRadius: gfCloud.map(c => c === 1 ? 4 : 0),
+        pointBackgroundColor: 'transparent',
+        pointBorderColor: BLUE,
+        pointBorderWidth: 1.5,
+        tension: 0.2,
+        order: 3,
+        spanGaps: true,
+      },
+      {
+        label: 'M2 — Média 3 anteriores',
+        data: gfMean3,
+        borderColor: YELLOW,
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [4, 4],
+        pointRadius: gfCloud.map(c => c === 1 ? 4 : 0),
+        pointBackgroundColor: 'transparent',
+        pointBorderColor: YELLOW,
+        pointBorderWidth: 1.5,
+        tension: 0.2,
+        order: 2,
+        spanGaps: true,
+      },
+      {
+        label: 'M3 — Interpolação Linear ⭐',
+        data: gfInterp,
+        borderColor: GREEN,
+        backgroundColor: 'transparent',
+        borderWidth: 2.5,
+        borderDash: [3, 2],
+        pointRadius: gfCloud.map(c => c === 1 ? 5 : 0),
+        pointBackgroundColor: 'transparent',
+        pointBorderColor: GREEN,
+        pointBorderWidth: 2,
+        tension: 0.2,
+        order: 1,
+        spanGaps: true,
+      },
+    ]
+  },
+  options: {
+    responsive: true,
+    animation: { duration: 700 },
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { labels: { color: TICK, boxWidth: 14, padding: 14 } },
+      tooltip: {
+        backgroundColor: '#161e19', borderColor: '#1f2e24', borderWidth: 1,
+        titleColor: GREEN, bodyColor: '#d4e8da', padding: 10,
+        callbacks: {
+          afterTitle: (items) => {
+            const i = items[0].dataIndex;
+            return gfCloud[i] === 1 ? '☁️ Imagem nublada — valor estimado' : '✅ Imagem válida';
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: GRID }, ticks: { color: TICK, maxTicksLimit: 16, maxRotation: 45 } },
+      y: { grid: { color: GRID }, ticks: { color: TICK }, min: 0, max: 1,
+           title: { display: true, text: 'NDVI', color: TICK } }
+    }
+  }
+});
+
+function openModal(imgElement) {
+  const modal = document.getElementById('imageModal');
+  const modalImg = document.getElementById('imgExpanded');
+  const captionText = document.getElementById('caption');
+  
+  modal.style.display = "block";
+  modalImg.src = imgElement.src;
+  captionText.innerHTML = imgElement.alt; // Usa o 'alt' da imagem como legenda
+}
+
+function closeModal() {
+  document.getElementById('imageModal').style.display = "none";
+}
+
+</script>
+
+<div id="imageModal" class="modal" onclick="closeModal()">
+  <span class="modal-close" onclick="closeModal()">&times;</span>
+  <img class="modal-content" id="imgExpanded">
+  <div id="caption" style="text-align:center; color:var(--muted); margin-top:15px; font-family:'Space Mono', monospace; font-size:12px;"></div>
+</div>
+</body>
+</html>

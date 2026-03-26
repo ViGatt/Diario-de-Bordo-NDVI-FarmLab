@@ -1,0 +1,11 @@
+# Pastas de dados e imagens
+ndvi/
+images/
+output_gap_filling/
+
+# Arquivos de dados brutos
+ndvi_metadata.csv
+ndvi_metadata.parquet
+
+# Temporários do Python
+__pycache__/
