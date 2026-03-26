@@ -1,6 +1,6 @@
 """
 ╔══════════════════════════════════════════════════════════════════╗
-║        GAP-FILLING TEMPORAL — NDVI FarmLab / Safra 2025-2026    ║
+║        GAP-FILLING TEMPORAL — NDVI FarmLab / Safra 2025-2026     ║
 ║  Substitui imagens nubladas pela estimativa de NDVI via:         ║
 ║    Método 1 → Forward Fill (última imagem válida)                ║
 ║    Método 2 → Média das N imagens válidas anteriores             ║
@@ -20,8 +20,8 @@ from pathlib import Path
 #  CONFIGURAÇÕES
 # ─────────────────────────────────────────────
 CSV_PATH    = "ndvi_metadata.csv"   # caminho do arquivo CSV
-OUTPUT_DIR  = Path("output_gap_filling")
-OUTPUT_DIR.mkdir(exist_ok=True)
+OUTPUT_DIR  = Path("docs/plots")
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 N_MEDIA     = 3    # número de imagens anteriores para o Método 2
 TALHOES = {

@@ -120,18 +120,41 @@ Para visualizar localmente, basta abrir o arquivo `diario_ndvi.html` no navegado
 
 ---
 
-## 📁 Estrutura do Repositório
+## 🛠️ Como Executar Localmente
 
+Devido ao tamanho dos arquivos raster e à sensibilidade dos dados agrícolas, os diretórios de imagens e as bases de dados brutas **não estão incluídos neste repositório** (configurados via `.gitignore`).
+
+Para rodar as análises em uma nova máquina, siga estes passos:
+
+### 1. Clonar o repositório
+```bash
+git clone https://github.com/vigatt/Diario-de-Bordo-NDVI-FarmLab.git
+cd Diario-de-Bordo-NDVI-FarmLab
 ```
+
+### 2. Obter os dados (Transferência Manual)
+Como os arquivos `GeoTIFF`, `JPEG` e `CSV/Parquet` são pesados, você deve solicitá-los ou movê-los manualmente para a raiz do projeto. 
+* **Via Nuvem:** Baixe a pasta de dados do https://unimarbr-my.sharepoint.com/personal/1959642_unimar_br/_layouts/15/onedrive.aspx?id=%2Fpersonal%2F1959642%5Funimar%5Fbr%2FDocuments%2FFarmLab&ga=1. (apenas com acesso de e-mail @unimar)
+
+---
+
+### 3. Estrutura de Pastas Esperada
+
+Para que o script de análise funcione corretamente, a árvore de diretórios local deve seguir este padrão. Note que os dados brutos e os resultados gerados são mantidos fora do GitHub via `.gitignore`.
+
+```text
 📦 ndvi-farmlab/
-├── 📄 diario_ndvi.html       # Diário de bordo interativo
-├── 📄 README.md              # Este arquivo
-├── 📂 ndvi/                  # GeoTIFFs (196 imagens)
-│   └── ndvi_raw_{season_id}_{data}.tiff
-├── 📂 images/                # Previews JPEG (196 imagens)
-│   └── ndvi_raw_{season_id}_{data}.jpg
-├── 📄 ndvi_metadata.csv      # Metadados raster (196 × 75)
-└── 📄 ndvi_metadata.parquet  # Idem em formato Parquet
+├── 📄 .gitignore             # Filtro de arquivos para o GitHub
+├── 📄 README.md              # Documentação do projeto
+├── 📄 diario_ndvi.html       # Dashboard/Site interativo
+├── 🐍 gap_filling_ndvi.py    # Script de tratamento de nuvens (Gap-Filling) [Novo]
+├── 📂 ndvi/                  # GeoTIFFs originais (Adicionar manualmente)
+├── 📂 plot/                  # Previews JPEG (Adicionar manualmente)
+├── 📄 ndvi_metadata.csv      # Base de dados original (Input do script)
+├── 📄 ndvi_metadata.parquet  # Base de dados otimizada (Input do script)
+└── 📂 output_gap_filling/    # RESULTADOS (Gerado automaticamente pelo script) [Novo]
+    ├── 📊 gap_filling_*.png  # Gráficos comparativos dos 3 métodos por talhão
+    └── 📄 ndvi_gap_filled.csv # Metadados com séries tratadas (Output final)
 ```
 
 ---
