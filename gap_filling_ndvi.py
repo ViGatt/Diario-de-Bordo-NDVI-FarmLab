@@ -19,9 +19,12 @@ from pathlib import Path
 # ─────────────────────────────────────────────
 #  CONFIGURAÇÕES
 # ─────────────────────────────────────────────
-CSV_PATH    = "ndvi_metadata.csv"   # caminho do arquivo CSV
-OUTPUT_DIR  = Path("docs/plots")
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+CSV_PATH         = "ndvi_metadata.csv"
+OUTPUT_DIR_WEB   = Path("docs/plots")           # Para o site (GitHub Pages)
+OUTPUT_DIR_LOCAL = Path("output_gap_filling")   # Para backup local
+
+OUTPUT_DIR_WEB.mkdir(parents=True, exist_ok=True)
+OUTPUT_DIR_LOCAL.mkdir(parents=True, exist_ok=True)
 
 N_MEDIA     = 3    # número de imagens anteriores para o Método 2
 TALHOES = {
@@ -217,11 +220,21 @@ def plotar_gap_filling(resultado: pd.DataFrame, talhao: str, metricas: dict):
                bbox_to_anchor=(0.5, 0.01))
 
     plt.tight_layout(rect=[0, 0.04, 1, 0.97])
-    output_path = OUTPUT_DIR / f"gap_filling_{talhao.replace(' ', '_').replace('.', '')}.png"
-    plt.savefig(output_path, dpi=150, bbox_inches="tight",
-                facecolor="#0a0f0d", edgecolor="none")
+    
+    # Limpeza do nome para compatibilidade Web (remove espaços, pontos e acentos)
+    talhao_limpo = talhao.replace(' ', '_').replace('.', '').replace('ã', 'a').replace('õ', 'o')
+    filename = f"gap_filling_{talhao_limpo}.png"
+
+    # 1. Salva na pasta do site
+    path_web = OUTPUT_DIR_WEB / filename
+    plt.savefig(path_web, dpi=150, bbox_inches="tight", facecolor="#0a0f0d", edgecolor="none")
+    
+    # 2. Salva na pasta local
+    path_local = OUTPUT_DIR_LOCAL / filename
+    plt.savefig(path_local, dpi=150, bbox_inches="tight", facecolor="#0a0f0d", edgecolor="none")
+    
     plt.close()
-    print(f"  ✅ Gráfico salvo: {output_path}")
+    print(f"  ✅ Gráfico atualizado em: {OUTPUT_DIR_WEB}/{filename}")
 
 
 # ─────────────────────────────────────────────
@@ -238,7 +251,7 @@ def exportar_csv(todos_resultados: list):
         "b1_std", "b1_valid_pixels", "b1_total_pixels"
     ]
     completo = completo[[c for c in cols if c in completo.columns]]
-    out = OUTPUT_DIR / "ndvi_gap_filled.csv"
+    out = OUTPUT_DIR_LOCAL / "ndvi_gap_filled.csv"
     completo.to_csv(out, index=False)
     print(f"\n  📄 CSV consolidado salvo: {out}")
     return completo
@@ -299,7 +312,7 @@ def main():
         nan_restantes = t["ndvi_interp"].isna().sum()
         print(f"  {talhao:<20}  {nubladas} gaps → {nan_restantes} não preenchidos")
 
-    print(f"\n  Arquivos salvos em: ./{OUTPUT_DIR}/")
+    print(f"\n  Arquivos salvos em: ./{OUTPUT_DIR_LOCAL}/ e ./{OUTPUT_DIR_WEB}/")
     print("  ✅ Gap-filling concluído com sucesso!\n")
 
 

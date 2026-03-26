@@ -8,3 +8,5 @@ ndvi_metadata.parquet
 
 # Temporários do Python
 __pycache__/
+
+!docs/plots/*.png
