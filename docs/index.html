@@ -2274,7 +2274,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight para o gestor</strong>
+      <strong>💡 Insight </strong>
       O satélite mostra que há potencial não explorado nos talhões de Grão. A área tem capacidade de crescimento maior — o dossel nunca chegou perto dos valores da Silagem, mesmo em condições climáticas idênticas. Investigar diferença de fertilidade entre os talhões é o próximo passo prioritário.
     </div>
 
@@ -2299,7 +2299,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight para o gestor</strong>
+      <strong>💡 Insight</strong>
       O déficit hídrico de novembro (−36,8mm) e janeiro (−45,3mm) indica que irrigação suplementar nesses períodos aumentaria o NDVI e reduziria a heterogeneidade entre zonas. Além disso, o monitoramento satelital tem limitação estrutural em regiões tropicais — os meses de plantio e florescimento precisam de complemento via <strong>radar (SAR/Sentinel-1)</strong> ou drones, que atravessam nuvens.
     </div>
 
@@ -2321,7 +2321,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight para o gestor</strong>
+      <strong>💡 Insight</strong>
       O painel de controle completo do manejo 4.0 exige três dados juntos: <strong>NDVI</strong> (biomassa) + <strong>registro de insumos por zona</strong> + <strong>mapa de yield</strong>. Sem os três, qualquer comparação entre sistemas é inconclusiva. Recomenda-se registrar as doses aplicadas por zona nesta safra para cruzamento com o yield de maio.
     </div>
 
@@ -2346,7 +2346,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight para o gestor</strong>
+      <strong>💡 Insight</strong>
       Os talhões Convencionais aplicam insumos uniformemente em áreas com desempenho heterogêneo demonstrado. Isso significa que zonas de alto vigor estão sendo <strong>subnutridas</strong> (poderiam responder a mais insumo) e zonas de baixo vigor recebem insumo que não conseguem converter. A migração para zonas de manejo tem embasamento nos dados satelitais já coletados — <strong>não é hipótese, é evidência</strong>.
     </div>
 
@@ -2381,7 +2381,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight para o gestor</strong>
+      <strong>💡 Insight</strong>
       Plataformas de monitoramento NDVI sem validação cruzada com dados climáticos têm risco real de gerar decisões equivocadas. Recomenda-se implementar um <strong>filtro de consistência automático</strong>: quedas abruptas de NDVI sem correspondência em eventos climáticos adversos devem ser marcadas como suspeitas antes de qualquer ação no campo.
     </div>
 
@@ -3248,16 +3248,91 @@ new Chart(document.getElementById('chartGapFilling'), {
 // RELATÓRIO EXECUTIVO — CHARTS
 // ═══════════════════════════════════════════════════════
 
-// ── Shared shorthand ──
-const ro = (opts) => ({
+// ── Helper: delta tooltip callback ──
+// Returns a tooltip with current value + Δ vs previous point for each dataset
+function makeDeltaTooltip(extraAfterTitle) {
+  return {
+    backgroundColor: '#0e1a12',
+    borderColor: '#1f2e24',
+    borderWidth: 1,
+    titleColor: GREEN,
+    bodyColor: '#d4e8da',
+    padding: 14,
+    boxPadding: 6,
+    usePointStyle: true,
+    callbacks: {
+      title: (items) => {
+        const label = items[0].label;
+        const extra = extraAfterTitle ? extraAfterTitle(items) : '';
+        return label + (extra ? '\n' + extra : '');
+      },
+      label: (item) => {
+        const ds   = item.chart.data.datasets[item.datasetIndex];
+        const data = ds.data;
+        const i    = item.dataIndex;
+        const cur  = data[i];
+        if (cur === null || cur === undefined) return ` ${ds.label}: —`;
+
+        let prev = null;
+        for (let j = i - 1; j >= 0; j--) {
+          if (data[j] !== null && data[j] !== undefined) { prev = data[j]; break; }
+        }
+
+        const valStr = typeof cur === 'number' ? cur.toFixed(4) : cur;
+        if (prev === null) return ` ${ds.label}: ${valStr}`;
+
+        const delta = cur - prev;
+        const arrow = delta > 0.001 ? '↑' : delta < -0.001 ? '↓' : '→';
+        const sign  = delta > 0 ? '+' : '';
+        return ` ${ds.label}: ${valStr}   ${arrow} ${sign}${delta.toFixed(4)}`;
+      }
+    }
+  };
+}
+
+// Simplified delta tooltip for non-NDVI charts (mm, %, etc.)
+function makeDeltaTooltipSimple(unit) {
+  return {
+    backgroundColor: '#0e1a12',
+    borderColor: '#1f2e24',
+    borderWidth: 1,
+    titleColor: GREEN,
+    bodyColor: '#d4e8da',
+    padding: 14,
+    boxPadding: 6,
+    usePointStyle: true,
+    callbacks: {
+      label: (item) => {
+        const ds   = item.chart.data.datasets[item.datasetIndex];
+        const data = ds.data;
+        const i    = item.dataIndex;
+        const cur  = data[i];
+        if (cur === null || cur === undefined) return ` ${ds.label}: —`;
+
+        let prev = null;
+        for (let j = i - 1; j >= 0; j--) {
+          if (data[j] !== null && data[j] !== undefined) { prev = data[j]; break; }
+        }
+
+        const u = unit || '';
+        const valStr = typeof cur === 'number' ? cur.toFixed(1) + u : cur;
+        if (prev === null) return ` ${ds.label}: ${valStr}`;
+
+        const delta = cur - prev;
+        const arrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '→';
+        const sign  = delta > 0 ? '+' : '';
+        return ` ${ds.label}: ${valStr}   ${arrow} ${sign}${delta.toFixed(1)}${u}`;
+      }
+    }
+  };
+}
+
+// ── Shared base options ──
+const roBase = () => ({
   responsive: true,
   animation: { duration: 600 },
   interaction: { mode: 'index', intersect: false },
-  plugins: {
-    legend: { labels: { color: TICK, boxWidth: 12, padding: 12 } },
-    tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:10 }
-  },
-  ...opts
+  plugins: { legend: { labels: { color: TICK, boxWidth: 12, padding: 12 } } }
 });
 
 // ── CHART 1: Curva fenológica comparativa ──
@@ -3266,18 +3341,20 @@ new Chart(document.getElementById('relChart1'), {
   data: {
     labels: ndviLabels,
     datasets: [
-      { label:'Silagem 4.0',   data:ndviSil40,    borderColor:GREEN,  borderWidth:3,   pointRadius:4, fill:false, tension:0.3, pointBackgroundColor:GREEN },
-      { label:'Silagem Conv.', data:ndviSilConv,  borderColor:BLUE,   borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:BLUE },
-      { label:'Grão Conv.',    data:ndviGraoConv, borderColor:YELLOW, borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:YELLOW, borderDash:[5,3] },
-      { label:'Grão 4.0',     data:ndviGrao40,   borderColor:ORANGE, borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:ORANGE, borderDash:[5,3] },
+      { label:'Silagem 4.0',   data:ndviSil40,    borderColor:GREEN,  borderWidth:3, pointRadius:4, fill:false, tension:0.3, pointBackgroundColor:GREEN },
+      { label:'Silagem Conv.', data:ndviSilConv,  borderColor:BLUE,   borderWidth:2, pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:BLUE },
+      { label:'Grão Conv.',    data:ndviGraoConv, borderColor:YELLOW, borderWidth:2, pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:YELLOW, borderDash:[5,3] },
+      { label:'Grão 4.0',     data:ndviGrao40,   borderColor:ORANGE, borderWidth:2, pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:ORANGE, borderDash:[5,3] },
     ]
   },
-  options: ro({
+  options: {
+    ...roBase(),
+    plugins: { ...roBase().plugins, tooltip: makeDeltaTooltip() },
     scales: {
       x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:14, maxRotation:45} },
       y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1, title:{display:true,text:'NDVI',color:TICK} }
     }
-  })
+  }
 });
 
 // ── CHART 2a: Precipitação mensal vs aproveitamento imagens ──
@@ -3303,13 +3380,15 @@ new Chart(document.getElementById('relChart2a'), {
       }
     ]
   },
-  options: ro({
+  options: {
+    ...roBase(),
+    plugins: { ...roBase().plugins, tooltip: makeDeltaTooltipSimple('') },
     scales: {
       x: { grid:{color:GRID}, ticks:{color:TICK} },
       yPrec:  { position:'left',  grid:{color:GRID}, ticks:{color:BLUE},  title:{display:true,text:'Prec. (mm)',color:BLUE}, min:0 },
       yAprov: { position:'right', grid:{drawOnChartArea:false}, ticks:{color:GREEN, callback:v=>v+'%'}, title:{display:true,text:'Aproveitamento',color:GREEN}, min:0, max:100 }
     }
-  })
+  }
 });
 
 // ── CHART 2b: Balanço hídrico mensal ──
@@ -3324,17 +3403,14 @@ new Chart(document.getElementById('relChart2b'), {
       borderRadius: 6,
     }]
   },
-  options: ro({
+  options: {
+    ...roBase(),
+    plugins: { ...roBase().plugins, tooltip: makeDeltaTooltipSimple(' mm') },
     scales: {
       x: { grid:{color:GRID}, ticks:{color:TICK} },
-      y: { grid:{color:GRID}, ticks:{color:TICK}, title:{display:true,text:'mm',color:TICK},
-           afterDataLimits: scale => { scale.max = Math.max(scale.max, 20); scale.min = Math.min(scale.min, -20); } }
-    },
-    plugins: {
-      ...ro({}).plugins,
-      annotation: {}
+      y: { grid:{color:GRID}, ticks:{color:TICK}, title:{display:true,text:'mm',color:TICK} }
     }
-  })
+  }
 });
 
 // ── CHART 3: NDVI médio Conv vs 4.0 ──
@@ -3347,13 +3423,15 @@ new Chart(document.getElementById('relChart3'), {
       { label:'Convencional',data:[0.499, 0.438], backgroundColor:'rgba(92,168,224,0.75)', borderRadius:6 },
     ]
   },
-  options: ro({
+  options: {
+    ...roBase(),
+    plugins: { ...roBase().plugins, tooltip: makeDeltaTooltipSimple('') },
     scales: {
       x: { grid:{color:GRID}, ticks:{color:TICK} },
       y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:0.7,
            title:{display:true,text:'NDVI médio da safra',color:TICK} }
     }
-  })
+  }
 });
 
 // ── CHART 4a: Heterogeneidade STD temporal ──
@@ -3368,13 +3446,15 @@ new Chart(document.getElementById('relChart4a'), {
       { label:'Grão Conv.',   data:hgcds, borderColor:YELLOW, borderWidth:2,   pointRadius:2, fill:false, tension:0.3, borderDash:[5,3] },
     ]
   },
-  options: ro({
+  options: {
+    ...roBase(),
+    plugins: { ...roBase().plugins, tooltip: makeDeltaTooltip() },
     scales: {
       x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:10, maxRotation:45} },
       y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:0.35,
            title:{display:true,text:'b1_std',color:TICK} }
     }
-  })
+  }
 });
 
 // ── CHART 4b: Classes no pico (16/jan) ──
@@ -3390,17 +3470,19 @@ new Chart(document.getElementById('relChart4b'), {
       { label:'Veg. Densa', data:[82.2,75.0,66.7,62.1], backgroundColor:GREEN, borderRadius:3 },
     ]
   },
-  options: ro({
+  options: {
+    ...roBase(),
+    plugins: { ...roBase().plugins, tooltip: makeDeltaTooltipSimple('%') },
     scales: {
       x: { stacked:true, grid:{color:GRID}, ticks:{color:TICK} },
       y: { stacked:true, grid:{color:GRID}, max:100,
            ticks:{color:TICK, callback:v=>v+'%'},
            title:{display:true,text:'% pixels',color:TICK} }
     }
-  })
+  }
 });
 
-// ── CHART 5: Anomalia 11/jan — NDVI dos 4 talhões em jan ──
+// ── CHART 5: Anomalia 11/jan ──
 const janLabels = ["01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26"];
 const janSil40  = [0.7367, 0.7696, 0.4595, 0.8388, 0.8188, 0.7401, 0.6844];
 const janSilC   = [0.6965, 0.6878, 0.4418, 0.8273, 0.8071, 0.7477, 0.5073];
@@ -3422,24 +3504,22 @@ new Chart(document.getElementById('relChart5'), {
         pointStyle: janGC.map((_,i)=>i===2?'rectRot':'circle') },
     ]
   },
-  options: ro({
+  options: {
+    ...roBase(),
     plugins: {
-      ...ro({}).plugins,
-      tooltip: {
-        backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1,
-        titleColor:GREEN, bodyColor:'#d4e8da', padding:10,
-        callbacks: {
-          afterTitle: (items) => items[0].label === '11/01/26' ? '⚠️ Anomalia — nuvem parcial não mascarada' : ''
-        }
-      }
+      ...roBase().plugins,
+      tooltip: makeDeltaTooltip((items) =>
+        items[0].label === '11/01/26' ? '⚠️ Anomalia — nuvem parcial não mascarada' : ''
+      )
     },
     scales: {
       x: { grid:{color:GRID}, ticks:{color:TICK} },
       y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1,
            title:{display:true,text:'NDVI',color:TICK} }
     }
-  })
+  }
 });
+
 
 
 
