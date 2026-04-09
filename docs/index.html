@@ -813,140 +813,6 @@
 
   .file-name { color: var(--white); font-family: 'Space Mono', monospace; font-size: 11px; }
   .file-desc { color: var(--muted); font-size: 12px; margin-left: auto; }
-  /* ── CAROUSEL STYLES ── */
-.carousel-container {
-  position: relative;
-  width: 100%;
-  margin: 20px 0;
-  overflow: hidden;
-  border-radius: 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-}
-
-.carousel-track {
-  display: flex;
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
-
-.carousel-slide {
-  min-width: 100%;
-  padding: 10px;
-}
-
-/* Customização dos Cards dentro do Carrossel */
-.carousel-slide .card {
-  margin-bottom: 0;
-  background: transparent;
-  border: none;
-}
-
-.carousel-slide .card::before { display: none; }
-
-.carousel-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 16px;
-  background: var(--card);
-  border-top: 1px solid var(--border);
-}
-
-.carousel-btn {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--ndvi);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.carousel-btn:hover {
-  background: var(--ndvi);
-  color: var(--bg);
-  border-color: var(--ndvi);
-}
-
-.carousel-dots {
-  display: flex;
-  gap: 8px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--border);
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.dot.active {
-  background: var(--ndvi);
-  width: 24px;
-  border-radius: 4px;
-}
-
-/* ── MODAL STYLES (Versão Corrigida) ── */
-.modal {
-  display: none; 
-  position: fixed; 
-  z-index: 2000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(10, 15, 13, 0.98);
-  backdrop-filter: blur(10px);
-  cursor: zoom-out;
-  /* Centralização Flexbox */
-  display: none; /* Alterado dinamicamente pelo JS */
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.modal-content {
-  margin: auto;
-  display: block;
-  max-width: 95%;      /* Ocupa quase toda a largura se necessário */
-  max-height: 85vh;    /* CHAVE: Limita a altura a 85% da altura da tela */
-  width: auto;         /* Mantém a proporção correta */
-  height: auto;
-  object-fit: contain; /* Garante que a imagem não seja cortada */
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 0 50px rgba(61, 220, 132, 0.2);
-  animation: zoomIn 0.3s ease-out;
-}
-
-@keyframes zoomIn {
-  from {transform: scale(0.7); opacity: 0}
-  to {transform: scale(1); opacity: 1}
-}
-
-.modal-close {
-  position: absolute;
-  top: 20px; right: 35px;
-  color: var(--ndvi);
-  font-size: 40px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.modal-close:hover { transform: scale(1.1); }
-
-/* Cursor de lupa para indicar que a imagem é clicável */
-.carousel-slide img, .card img {
-  cursor: zoom-in;
-}
-
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
@@ -1004,6 +870,9 @@
     </button>
     <button class="tab-btn" onclick="switchTab('gapfilling', this)">
       <span class="tab-num">10</span>Gap-Filling<span class="tab-new-badge">NOVO</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('relatorio', this)">
+      <span class="tab-num">11</span>Relatório Executivo<span class="tab-new-badge">NOVO</span>
     </button>
   </nav>
 </header>
@@ -2264,62 +2133,6 @@
       </div>
     </div>
 
-    <h2>Análise por Talhão (Saídas do Script)</h2>
-<div class="carousel-container">
-  <div class="carousel-track" id="carouselTrack">
-    <div class="carousel-slide">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-          <h3>Silagem Convencional (0bf86c8b)</h3>
-          <span class="talhao-tag tag-silagem">Convencional</span>
-        </div>
-        <img src="plots/gap_filling_Silagem_Conv.png" alt="Silagem Conv" style="width:100%; border-radius:6px;" onclick="openModal(this)">
-      </div>
-    </div>
-    
-    <div class="carousel-slide">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-          <h3>Silagem 4.0 (f791bf13)</h3>
-          <span class="talhao-tag tag-40">Ag. Precisão 4.0</span>
-        </div>
-        <img src="plots/gap_filling_Silagem_40.png" alt="Silagem 4.0" style="width:100%; border-radius:6px;" onclick="openModal(this)">
-      </div>
-    </div>
-
-    <div class="carousel-slide">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-          <h3>Grão Convencional (b7292cb8)</h3>
-          <span class="talhao-tag tag-grao">Convencional</span>
-        </div>
-        <img src="plots/gap_filling_Grao_Conv.png" alt="Grão Conv" style="width:100%; border-radius:6px;" onclick="openModal(this)">
-      </div>
-    </div>
-
-    <div class="carousel-slide">
-      <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-          <h3>Grão 4.0 (258e47e0)</h3>
-          <span class="talhao-tag tag-40">Ag. Precisão 4.0</span>
-        </div>
-        <img src="plots/gap_filling_Grao_40.png" alt="Grão 4.0" style="width:100%; border-radius:6px;" onclick="openModal(this)">
-      </div>
-    </div>
-  </div>
-
-  <div class="carousel-nav">
-    <button class="carousel-btn" onclick="moveSlide(-1)">❮</button>
-    <div class="carousel-dots" id="carouselDots">
-      <span class="dot active" onclick="jumpToSlide(0)"></span>
-      <span class="dot" onclick="jumpToSlide(1)"></span>
-      <span class="dot" onclick="jumpToSlide(2)"></span>
-      <span class="dot" onclick="jumpToSlide(3)"></span>
-    </div>
-    <button class="carousel-btn" onclick="moveSlide(1)">❯</button>
-  </div>
-</div>
-
     <!-- CÓDIGO PYTHON -->
     <h2>Código Python — Como Executar</h2>
     <div class="card">
@@ -2391,6 +2204,254 @@ for cada_data in todas_as_datas:
       <strong>⚠️ Importante para o Relatório Acadêmico</strong>
       Os valores preenchidos pelo gap-filling são <strong>estimativas, não observações reais</strong>. Ao usá-los em análises, é necessário distinguir claramente os dados originais dos estimados — por exemplo, usando uma coluna <code>is_gap_filled = True/False</code> no CSV. O Método 3 (interpolação linear) é o recomendado para fenologia de culturas porque respeita a tendência de crescimento, mas ainda assim introduz incerteza que deve ser documentada na metodologia do trabalho.
     </div>
+  </div>
+
+  <!-- ═══════════════════════════ TAB 11 — RELATÓRIO EXECUTIVO ═══════════════════════════ -->
+  <div id="tab-relatorio" class="tab-panel">
+    <div class="section-label">// 11 — Relatório Executivo</div>
+    <h2>Síntese Qualitativa</h2>
+    <p style="color:var(--muted);margin-bottom:8px">Cada inferência é acompanhada do gráfico que a sustenta. Documento estruturado para apresentação.</p>
+
+    <!-- CABEÇALHO EXECUTIVO -->
+    <div style="background:linear-gradient(135deg,rgba(61,220,132,0.08),rgba(61,220,132,0.02));border:1px solid rgba(61,220,132,0.25);border-radius:12px;padding:24px 28px;margin:20px 0 32px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ndvi),var(--blue),transparent)"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+        <div style="flex:1;min-width:220px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Cultura monitorada</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--white)">Milho · Safra 2025–2026</div>
+          <div style="color:var(--muted);font-size:13px;margin-top:4px">4 talhões · 49 datas · Sentinel-2 (ESA)</div>
+        </div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--ndvi)">0,839</div>
+            <div style="font-size:11px;color:var(--muted)">Pico NDVI</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--yellow)">16/Jan</div>
+            <div style="font-size:11px;color:var(--muted)">Data do pico</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--red)">39,3%</div>
+            <div style="font-size:11px;color:var(--muted)">Imagens perdidas</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--blue)">748mm</div>
+            <div style="font-size:11px;color:var(--muted)">Precipitação total</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ INFERÊNCIA 1 ══ -->
+    <div style="border-left:4px solid var(--ndvi);padding-left:20px;margin-bottom:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Inferência 01</div>
+      <h2 style="margin-bottom:8px">A safra teve desempenho adequado — mas não uniforme</h2>
+    </div>
+    <p style="margin-bottom:16px">O milho atingiu pico de biomassa em <strong>16/jan/2026</strong> com excelentes indicadores em todos os talhões. Porém, os quatro nunca performaram igual ao mesmo tempo. A Silagem chegou ao pico com <strong>80% da área coberta por vegetação densa</strong>, enquanto os talhões de Grão ficaram entre 62% e 67% — diferença que reflete não apenas a biologia distinta entre cultivares, mas possíveis variações de fertilidade e posição no relevo ainda não compensadas pelo manejo.</p>
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b1">Prova — Curva Fenológica dos 4 Talhões</span>
+        <span style="color:var(--muted);font-size:12px">NDVI médio · datas comuns válidas</span>
+      </div>
+      <canvas id="relChart1" height="110"></canvas>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px">
+        <div class="stat-pill" style="flex:1;min-width:120px">
+          <span class="stat-value" style="font-size:16px;color:var(--ndvi)">0,839</span>
+          <span class="stat-label">Pico Silagem 4.0</span>
+        </div>
+        <div class="stat-pill" style="flex:1;min-width:120px">
+          <span class="stat-value" style="font-size:16px">0,762</span>
+          <span class="stat-label">Pico Grão Conv.</span>
+        </div>
+        <div class="stat-pill" style="flex:1;min-width:120px">
+          <span class="stat-value" style="font-size:16px;color:var(--yellow)">+10,2%</span>
+          <span class="stat-label">Silagem sobre Grão</span>
+        </div>
+        <div class="stat-pill" style="flex:1;min-width:120px">
+          <span class="stat-value" style="font-size:16px">16/Jan</span>
+          <span class="stat-label">Pico universal</span>
+        </div>
+      </div>
+    </div>
+    <div class="note-box" style="margin-bottom:32px">
+      <strong>💡 Insight para o gestor</strong>
+      O satélite mostra que há potencial não explorado nos talhões de Grão. A área tem capacidade de crescimento maior — o dossel nunca chegou perto dos valores da Silagem, mesmo em condições climáticas idênticas. Investigar diferença de fertilidade entre os talhões é o próximo passo prioritário.
+    </div>
+
+    <!-- ══ INFERÊNCIA 2 ══ -->
+    <div style="border-left:4px solid var(--blue);padding-left:20px;margin-bottom:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Inferência 02</div>
+      <h2 style="margin-bottom:8px">O clima foi aliado em janeiro e adversário em outubro e dezembro</h2>
+    </div>
+    <p style="margin-bottom:16px">Janeiro entregou a janela climática perfeita — o milho respondeu com o maior NDVI da série. Mas outubro (plantio) teve <strong>71% de imagens nubladas</strong>, e dezembro, com <strong>320mm em um único mês</strong> e evento de 129mm em um dia, gerou risco de encharcamento e lixiviação de nutrientes. O balanço hídrico de novembro e janeiro foi negativo — a lavoura evapotranspirou mais do que choveu nesses meses.</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="band-header" style="margin-bottom:12px">
+          <span class="band-pill b2">Precipitação Mensal vs. Aproveitamento de Imagens</span>
+        </div>
+        <canvas id="relChart2a" height="160"></canvas>
+      </div>
+      <div class="card">
+        <div class="band-header" style="margin-bottom:12px">
+          <span class="band-pill b3">Balanço Hídrico Mensal (Prec − ETo)</span>
+        </div>
+        <canvas id="relChart2b" height="160"></canvas>
+      </div>
+    </div>
+    <div class="note-box" style="margin-bottom:32px">
+      <strong>💡 Insight para o gestor</strong>
+      O déficit hídrico de novembro (−36,8mm) e janeiro (−45,3mm) indica que irrigação suplementar nesses períodos aumentaria o NDVI e reduziria a heterogeneidade entre zonas. Além disso, o monitoramento satelital tem limitação estrutural em regiões tropicais — os meses de plantio e florescimento precisam de complemento via <strong>radar (SAR/Sentinel-1)</strong> ou drones, que atravessam nuvens.
+    </div>
+
+    <!-- ══ INFERÊNCIA 3 ══ -->
+    <div style="border-left:4px solid var(--yellow);padding-left:20px;margin-bottom:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--yellow);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Inferência 03</div>
+      <h2 style="margin-bottom:8px">O manejo 4.0 não se prova pelo NDVI — e isso é esperado</h2>
+    </div>
+    <p style="margin-bottom:16px">O Grão Convencional teve NDVI médio <strong>6% maior</strong> que o Grão 4.0. Visto isoladamente, pareceria indicar superioridade do manejo convencional. Mas essa leitura é incorreta. A agricultura de precisão não maximiza biomassa média — ela <strong>redistribui insumos por zona de potencial</strong>. O resultado esperado é eficiência, não NDVI maior. A prova definitiva virá com os mapas de yield em maio/2026.</p>
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b3">NDVI Médio da Safra — Conv. vs. 4.0</span>
+        <span style="color:var(--muted);font-size:12px">Por tipo de cultura · imagens válidas</span>
+      </div>
+      <canvas id="relChart3" height="120"></canvas>
+      <div class="note-box" style="margin-top:16px;padding:12px 16px;font-size:13px">
+        <strong>⚠️ Atenção na interpretação</strong>
+        NDVI mede <strong>biomassa foliar</strong>, não eficiência agronômica. Um talhão pode ter NDVI menor e produzir mais grãos — porque o manejo 4.0 concentra energia no enchimento do grão em cada zona, não em crescimento vegetativo máximo. O indicador correto para avaliar o 4.0 é <strong>produtividade (kg/ha) por real investido em insumo</strong>.
+      </div>
+    </div>
+    <div class="note-box" style="margin-bottom:32px">
+      <strong>💡 Insight para o gestor</strong>
+      O painel de controle completo do manejo 4.0 exige três dados juntos: <strong>NDVI</strong> (biomassa) + <strong>registro de insumos por zona</strong> + <strong>mapa de yield</strong>. Sem os três, qualquer comparação entre sistemas é inconclusiva. Recomenda-se registrar as doses aplicadas por zona nesta safra para cruzamento com o yield de maio.
+    </div>
+
+    <!-- ══ INFERÊNCIA 4 ══ -->
+    <div style="border-left:4px solid var(--orange,#f59342);padding-left:20px;margin-bottom:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:#f59342;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Inferência 04</div>
+      <h2 style="margin-bottom:8px">As zonas de baixo vigor já estão mapeadas — falta agir sobre elas</h2>
+    </div>
+    <p style="margin-bottom:16px">A análise de heterogeneidade revelou que todos os talhões têm áreas internas de desempenho desigual. Nos talhões de Grão, essa variabilidade <strong>aumenta junto com o NDVI</strong> (correlação +0,53) — zonas distintas crescem em ritmos diferentes, e esse padrão é consistente, não aleatório. O satélite já entregou o mapa. O próximo passo é cruzar com análise de solo para identificar a causa.</p>
+    <div class="card-grid">
+      <div class="card">
+        <div class="band-header" style="margin-bottom:12px">
+          <span class="band-pill b1">Heterogeneidade (b1_std) ao Longo do Tempo</span>
+        </div>
+        <canvas id="relChart4a" height="160"></canvas>
+      </div>
+      <div class="card">
+        <div class="band-header" style="margin-bottom:12px">
+          <span class="band-pill b2">Distribuição de Classes no Pico (16/Jan)</span>
+        </div>
+        <canvas id="relChart4b" height="160"></canvas>
+      </div>
+    </div>
+    <div class="note-box" style="margin-bottom:32px">
+      <strong>💡 Insight para o gestor</strong>
+      Os talhões Convencionais aplicam insumos uniformemente em áreas com desempenho heterogêneo demonstrado. Isso significa que zonas de alto vigor estão sendo <strong>subnutridas</strong> (poderiam responder a mais insumo) e zonas de baixo vigor recebem insumo que não conseguem converter. A migração para zonas de manejo tem embasamento nos dados satelitais já coletados — <strong>não é hipótese, é evidência</strong>.
+    </div>
+
+    <!-- ══ INFERÊNCIA 5 ══ -->
+    <div style="border-left:4px solid var(--red);padding-left:20px;margin-bottom:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Inferência 05</div>
+      <h2 style="margin-bottom:8px">Dado não validado gera decisão errada — a anomalia de 11/jan prova isso</h2>
+    </div>
+    <p style="margin-bottom:16px">Em 11/jan, com clima perfeito, os talhões de Grão apresentaram NDVI de 0,25 — valor de solo exposto. A máscara de qualidade do Sentinel-2 não detectou a nuvem parcial. Sem cruzamento com dados climáticos, esse ponto geraria <strong>alarme falso de stress</strong>, podendo resultar em aplicação desnecessária de defensivos ou fertilizantes.</p>
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b2">Prova — Anomalia 11/Jan · NDVI vs. Condição Climática</span>
+      </div>
+      <canvas id="relChart5" height="110"></canvas>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:16px">
+        <div class="stat-pill" style="flex:1;min-width:140px">
+          <span class="stat-value" style="font-size:16px;color:var(--red)">0,250</span>
+          <span class="stat-label">NDVI Grão Conv. em 11/jan</span>
+        </div>
+        <div class="stat-pill" style="flex:1;min-width:140px">
+          <span class="stat-value" style="font-size:16px;color:var(--ndvi)">0,440</span>
+          <span class="stat-label">NDVI Silagem (mesmo dia)</span>
+        </div>
+        <div class="stat-pill" style="flex:1;min-width:140px">
+          <span class="stat-value" style="font-size:16px">83,8%</span>
+          <span class="stat-label">Umidade no dia — clima ok</span>
+        </div>
+        <div class="stat-pill" style="flex:1;min-width:140px">
+          <span class="stat-value" style="font-size:16px">24,5°C</span>
+          <span class="stat-label">Temp. média — clima ok</span>
+        </div>
+      </div>
+    </div>
+    <div class="note-box" style="margin-bottom:32px">
+      <strong>💡 Insight para o gestor</strong>
+      Plataformas de monitoramento NDVI sem validação cruzada com dados climáticos têm risco real de gerar decisões equivocadas. Recomenda-se implementar um <strong>filtro de consistência automático</strong>: quedas abruptas de NDVI sem correspondência em eventos climáticos adversos devem ser marcadas como suspeitas antes de qualquer ação no campo.
+    </div>
+
+    <!-- ══ RESUMO EXECUTIVO FINAL ══ -->
+    <div style="border-left:4px solid var(--ndvi);padding-left:20px;margin-bottom:16px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Síntese Final</div>
+      <h2 style="margin-bottom:0">Quadro de Recomendações</h2>
+    </div>
+    <div class="card" style="margin-bottom:24px">
+      <table>
+        <thead>
+          <tr><th>Tema</th><th>Situação Atual</th><th>Recomendação</th><th>Prioridade</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Crescimento</strong></td>
+            <td class="muted">Adequado — pico atingido em 16/jan</td>
+            <td class="muted">Investigar por que Grão fica 10% abaixo da Silagem</td>
+            <td><span style="color:var(--yellow)">Média</span></td>
+          </tr>
+          <tr>
+            <td><strong>Cobertura satelital</strong></td>
+            <td class="muted">39% de perda em meses críticos</td>
+            <td class="muted">Complementar com radar SAR ou drones em out e dez</td>
+            <td><span style="color:var(--red)">Alta</span></td>
+          </tr>
+          <tr>
+            <td><strong>Déficit hídrico</strong></td>
+            <td class="muted">−45mm em nov e jan</td>
+            <td class="muted">Avaliar viabilidade de irrigação suplementar no florescimento</td>
+            <td><span style="color:var(--yellow)">Média</span></td>
+          </tr>
+          <tr>
+            <td><strong>Validação do 4.0</strong></td>
+            <td class="muted">NDVI inconclusivo — yield pendente</td>
+            <td class="muted">Cruzar NDVI + doses por zona + mapa yield (mai/26)</td>
+            <td><span style="color:var(--red)">Alta</span></td>
+          </tr>
+          <tr>
+            <td><strong>Zonas de manejo</strong></td>
+            <td class="muted">Heterogeneidade mapeada pelo satélite</td>
+            <td class="muted">Análise de solo nas zonas de baixo NDVI para confirmar causa</td>
+            <td><span style="color:var(--red)">Alta</span></td>
+          </tr>
+          <tr>
+            <td><strong>Qualidade de dados</strong></td>
+            <td class="muted">Anomalias não detectadas pela máscara B2</td>
+            <td class="muted">Implementar filtro de consistência NDVI × clima</td>
+            <td><span style="color:var(--yellow)">Média</span></td>
+          </tr>
+          <tr>
+            <td><strong>Expansão do 4.0</strong></td>
+            <td class="muted">Talhões Conv. com heterogeneidade comprovada</td>
+            <td class="muted">Usar mapa b1_std como base para definir zonas nos Conv.</td>
+            <td><span style="color:var(--ndvi)">Planejamento</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- FRASE FINAL -->
+    <div style="background:linear-gradient(135deg,rgba(61,220,132,0.06),rgba(92,168,224,0.04));border:1px solid rgba(61,220,132,0.2);border-radius:12px;padding:28px;text-align:center">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Conclusão do Projeto</div>
+      <p style="font-family:'Syne',sans-serif;font-size:16px;color:var(--white);line-height:1.7;max-width:720px;margin:0 auto">
+        O satélite entregou o diagnóstico. O clima entregou o contexto. A heterogeneidade entregou o mapa. <br>
+        <span style="color:var(--ndvi)">O que falta é o desfecho — e ele virá com a colheita.</span><br>
+        <span style="color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif">NDVI mede biomassa. Yield mede resultado. Eficiência é a razão entre os dois.</span>
+      </p>
+    </div>
+
   </div>
 
 </main>
@@ -2501,29 +2562,6 @@ git push</div>
       panel.classList.add('active');
     }, 300);
   }
-  let currentSlide = 0;
-const totalSlides = 4;
-
-function moveSlide(direction) {
-  currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
-  updateCarousel();
-}
-
-function jumpToSlide(index) {
-  currentSlide = index;
-  updateCarousel();
-}
-
-function updateCarousel() {
-  const track = document.getElementById('carouselTrack');
-  const dots = document.querySelectorAll('.dot');
-  
-  track.style.transform = `translateX(-${currentSlide * 100}%)`;
-  
-  dots.forEach((dot, index) => {
-    dot.classList.toggle('active', index === currentSlide);
-  });
-}
 </script>
 <script>
 // ── CLIMATE DATA ──
@@ -3206,26 +3244,205 @@ new Chart(document.getElementById('chartGapFilling'), {
   }
 });
 
-function openModal(imgElement) {
-  const modal = document.getElementById('imageModal');
-  const modalImg = document.getElementById('imgExpanded');
-  const captionText = document.getElementById('caption');
-  
-  modal.style.display = "block";
-  modalImg.src = imgElement.src;
-  captionText.innerHTML = imgElement.alt; // Usa o 'alt' da imagem como legenda
-}
+// ═══════════════════════════════════════════════════════
+// RELATÓRIO EXECUTIVO — CHARTS
+// ═══════════════════════════════════════════════════════
 
-function closeModal() {
-  document.getElementById('imageModal').style.display = "none";
-}
+// ── Shared shorthand ──
+const ro = (opts) => ({
+  responsive: true,
+  animation: { duration: 600 },
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { labels: { color: TICK, boxWidth: 12, padding: 12 } },
+    tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:10 }
+  },
+  ...opts
+});
+
+// ── CHART 1: Curva fenológica comparativa ──
+new Chart(document.getElementById('relChart1'), {
+  type: 'line',
+  data: {
+    labels: ndviLabels,
+    datasets: [
+      { label:'Silagem 4.0',   data:ndviSil40,    borderColor:GREEN,  borderWidth:3,   pointRadius:4, fill:false, tension:0.3, pointBackgroundColor:GREEN },
+      { label:'Silagem Conv.', data:ndviSilConv,  borderColor:BLUE,   borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:BLUE },
+      { label:'Grão Conv.',    data:ndviGraoConv, borderColor:YELLOW, borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:YELLOW, borderDash:[5,3] },
+      { label:'Grão 4.0',     data:ndviGrao40,   borderColor:ORANGE, borderWidth:2,   pointRadius:3, fill:false, tension:0.3, pointBackgroundColor:ORANGE, borderDash:[5,3] },
+    ]
+  },
+  options: ro({
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:14, maxRotation:45} },
+      y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1, title:{display:true,text:'NDVI',color:TICK} }
+    }
+  })
+});
+
+// ── CHART 2a: Precipitação mensal vs aproveitamento imagens ──
+new Chart(document.getElementById('relChart2a'), {
+  type: 'bar',
+  data: {
+    labels: ['Nov/25','Dez/25','Jan/26','Fev/26'],
+    datasets: [
+      {
+        label: 'Precipitação (mm)',
+        data: [102.2, 320.2, 102.4, 223.4],
+        backgroundColor: ['rgba(92,168,224,0.7)','rgba(224,92,92,0.7)','rgba(92,168,224,0.7)','rgba(245,200,66,0.7)'],
+        borderRadius: 4, yAxisID: 'yPrec', order: 2
+      },
+      {
+        label: 'Aproveitamento imagens (%)',
+        data: [75.0, 33.3, 84.4, 40.0],
+        type: 'line',
+        borderColor: GREEN, backgroundColor:'transparent',
+        borderWidth: 2.5, pointRadius: 6,
+        pointBackgroundColor: [GREEN, RED, GREEN, YELLOW],
+        tension: 0.3, yAxisID: 'yAprov', order: 1
+      }
+    ]
+  },
+  options: ro({
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK} },
+      yPrec:  { position:'left',  grid:{color:GRID}, ticks:{color:BLUE},  title:{display:true,text:'Prec. (mm)',color:BLUE}, min:0 },
+      yAprov: { position:'right', grid:{drawOnChartArea:false}, ticks:{color:GREEN, callback:v=>v+'%'}, title:{display:true,text:'Aproveitamento',color:GREEN}, min:0, max:100 }
+    }
+  })
+});
+
+// ── CHART 2b: Balanço hídrico mensal ──
+new Chart(document.getElementById('relChart2b'), {
+  type: 'bar',
+  data: {
+    labels: ['Nov/25','Dez/25','Jan/26','Fev/26'],
+    datasets: [{
+      label: 'Balanço Hídrico (Prec − ETo)',
+      data: [-36.8, 179.9, -45.3, 129.0],
+      backgroundColor: [-36.8, 179.9, -45.3, 129.0].map(v => v >= 0 ? 'rgba(61,220,132,0.7)' : 'rgba(224,92,92,0.7)'),
+      borderRadius: 6,
+    }]
+  },
+  options: ro({
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK} },
+      y: { grid:{color:GRID}, ticks:{color:TICK}, title:{display:true,text:'mm',color:TICK},
+           afterDataLimits: scale => { scale.max = Math.max(scale.max, 20); scale.min = Math.min(scale.min, -20); } }
+    },
+    plugins: {
+      ...ro({}).plugins,
+      annotation: {}
+    }
+  })
+});
+
+// ── CHART 3: NDVI médio Conv vs 4.0 ──
+new Chart(document.getElementById('relChart3'), {
+  type: 'bar',
+  data: {
+    labels: ['Silagem', 'Grão'],
+    datasets: [
+      { label:'4.0',         data:[0.516, 0.413], backgroundColor:'rgba(61,220,132,0.75)',  borderRadius:6 },
+      { label:'Convencional',data:[0.499, 0.438], backgroundColor:'rgba(92,168,224,0.75)', borderRadius:6 },
+    ]
+  },
+  options: ro({
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK} },
+      y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:0.7,
+           title:{display:true,text:'NDVI médio da safra',color:TICK} }
+    }
+  })
+});
+
+// ── CHART 4a: Heterogeneidade STD temporal ──
+new Chart(document.getElementById('relChart4a'), {
+  type: 'line',
+  data: {
+    labels: hs40d,
+    datasets: [
+      { label:'Silagem 4.0',   data:hs40s, borderColor:GREEN,  borderWidth:2.5, pointRadius:2, fill:false, tension:0.3 },
+      { label:'Silagem Conv.', data:hscds, borderColor:BLUE,   borderWidth:2,   pointRadius:2, fill:false, tension:0.3 },
+      { label:'Grão 4.0',     data:hg40s, borderColor:ORANGE, borderWidth:2,   pointRadius:2, fill:false, tension:0.3, borderDash:[5,3] },
+      { label:'Grão Conv.',   data:hgcds, borderColor:YELLOW, borderWidth:2,   pointRadius:2, fill:false, tension:0.3, borderDash:[5,3] },
+    ]
+  },
+  options: ro({
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:10, maxRotation:45} },
+      y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:0.35,
+           title:{display:true,text:'b1_std',color:TICK} }
+    }
+  })
+});
+
+// ── CHART 4b: Classes no pico (16/jan) ──
+new Chart(document.getElementById('relChart4b'), {
+  type: 'bar',
+  data: {
+    labels: ['Silagem 4.0','Silagem Conv.','Grão Conv.','Grão 4.0'],
+    datasets: [
+      { label:'Solo',       data:[1.1,1.4,3.4,3.4], backgroundColor:'#8b7355', borderRadius:3 },
+      { label:'Veg. Baixa', data:[0.8,0.8,4.5,4.7], backgroundColor:'#8db87a', borderRadius:3 },
+      { label:'Veg. Mod.',  data:[1.3,3.5,5.8,8.0], backgroundColor:'#4d9e5e', borderRadius:3 },
+      { label:'Veg. Alta',  data:[13.0,19.4,19.6,21.5], backgroundColor:'#2a7a3c', borderRadius:3 },
+      { label:'Veg. Densa', data:[82.2,75.0,66.7,62.1], backgroundColor:GREEN, borderRadius:3 },
+    ]
+  },
+  options: ro({
+    scales: {
+      x: { stacked:true, grid:{color:GRID}, ticks:{color:TICK} },
+      y: { stacked:true, grid:{color:GRID}, max:100,
+           ticks:{color:TICK, callback:v=>v+'%'},
+           title:{display:true,text:'% pixels',color:TICK} }
+    }
+  })
+});
+
+// ── CHART 5: Anomalia 11/jan — NDVI dos 4 talhões em jan ──
+const janLabels = ["01/01/26","06/01/26","11/01/26","16/01/26","21/01/26","26/01/26","31/01/26"];
+const janSil40  = [0.7367, 0.7696, 0.4595, 0.8388, 0.8188, 0.7401, 0.6844];
+const janSilC   = [0.6965, 0.6878, 0.4418, 0.8273, 0.8071, 0.7477, 0.5073];
+const janG40    = [0.6554, 0.2406, 0.2874, 0.7547, 0.7193, 0.5699, 0.5731];
+const janGC     = [0.6717, null,   0.2496, 0.7625, 0.7336, 0.6167, 0.662 ];
+
+new Chart(document.getElementById('relChart5'), {
+  type: 'line',
+  data: {
+    labels: janLabels,
+    datasets: [
+      { label:'Silagem 4.0',   data:janSil40, borderColor:GREEN,  borderWidth:2.5, pointRadius:5, fill:false, tension:0.2, pointBackgroundColor:GREEN },
+      { label:'Silagem Conv.', data:janSilC,  borderColor:BLUE,   borderWidth:2,   pointRadius:5, fill:false, tension:0.2, pointBackgroundColor:BLUE },
+      { label:'Grão 4.0',     data:janG40,   borderColor:ORANGE, borderWidth:2,   pointRadius:janG40.map((_,i)=>i===1||i===2?8:5), fill:false, tension:0.2,
+        pointBackgroundColor: janG40.map((_,i)=>i===1||i===2?RED:ORANGE),
+        pointStyle: janG40.map((_,i)=>i===1||i===2?'rectRot':'circle') },
+      { label:'Grão Conv.',   data:janGC,    borderColor:YELLOW, borderWidth:2,   pointRadius:janGC.map((_,i)=>i===2?8:5), fill:false, tension:0.2, spanGaps:true,
+        pointBackgroundColor: janGC.map((_,i)=>i===2?RED:YELLOW),
+        pointStyle: janGC.map((_,i)=>i===2?'rectRot':'circle') },
+    ]
+  },
+  options: ro({
+    plugins: {
+      ...ro({}).plugins,
+      tooltip: {
+        backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1,
+        titleColor:GREEN, bodyColor:'#d4e8da', padding:10,
+        callbacks: {
+          afterTitle: (items) => items[0].label === '11/01/26' ? '⚠️ Anomalia — nuvem parcial não mascarada' : ''
+        }
+      }
+    },
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK} },
+      y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1,
+           title:{display:true,text:'NDVI',color:TICK} }
+    }
+  })
+});
+
+
 
 </script>
-
-<div id="imageModal" class="modal" onclick="closeModal()">
-  <span class="modal-close" onclick="closeModal()">&times;</span>
-  <img class="modal-content" id="imgExpanded">
-  <div id="caption" style="text-align:center; color:var(--muted); margin-top:15px; font-family:'Space Mono', monospace; font-size:12px;"></div>
-</div>
 </body>
 </html>
