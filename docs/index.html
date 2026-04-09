@@ -2274,7 +2274,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight </strong>
+      <strong>💡 Insight</strong>
       O satélite mostra que há potencial não explorado nos talhões de Grão. A área tem capacidade de crescimento maior — o dossel nunca chegou perto dos valores da Silagem, mesmo em condições climáticas idênticas. Investigar diferença de fertilidade entre os talhões é o próximo passo prioritário.
     </div>
 
@@ -2586,6 +2586,78 @@ const RED    = '#e05c5c';
 const BLUE   = '#5ca8e0';
 const ORANGE = '#f59342';
 
+// ── Delta tooltip helpers (usados em todos os gráficos) ──
+function makeDeltaTooltip(extraAfterTitle) {
+  return {
+    backgroundColor: '#0e1a12',
+    borderColor: '#1f2e24',
+    borderWidth: 1,
+    titleColor: GREEN,
+    bodyColor: '#d4e8da',
+    padding: 14,
+    boxPadding: 6,
+    usePointStyle: true,
+    callbacks: {
+      title: (items) => {
+        const label = items[0].label;
+        const extra = extraAfterTitle ? extraAfterTitle(items) : '';
+        return label + (extra ? '\n' + extra : '');
+      },
+      label: (item) => {
+        const ds   = item.chart.data.datasets[item.datasetIndex];
+        const data = ds.data;
+        const i    = item.dataIndex;
+        const cur  = data[i];
+        if (cur === null || cur === undefined) return ` ${ds.label}: —`;
+        let prev = null;
+        for (let j = i - 1; j >= 0; j--) {
+          if (data[j] !== null && data[j] !== undefined) { prev = data[j]; break; }
+        }
+        const valStr = cur.toFixed(4);
+        if (prev === null) return ` ${ds.label}: ${valStr}`;
+        const delta = cur - prev;
+        const arrow = delta > 0.001 ? '↑' : delta < -0.001 ? '↓' : '→';
+        const sign  = delta > 0 ? '+' : '';
+        return ` ${ds.label}: ${valStr}   ${arrow} ${sign}${delta.toFixed(4)}`;
+      }
+    }
+  };
+}
+
+function makeDeltaTooltipSimple(unit) {
+  return {
+    backgroundColor: '#0e1a12',
+    borderColor: '#1f2e24',
+    borderWidth: 1,
+    titleColor: GREEN,
+    bodyColor: '#d4e8da',
+    padding: 14,
+    boxPadding: 6,
+    usePointStyle: true,
+    callbacks: {
+      label: (item) => {
+        const ds   = item.chart.data.datasets[item.datasetIndex];
+        const data = ds.data;
+        const i    = item.dataIndex;
+        const cur  = data[i];
+        if (cur === null || cur === undefined) return ` ${ds.label}: —`;
+        let prev = null;
+        for (let j = i - 1; j >= 0; j--) {
+          if (data[j] !== null && data[j] !== undefined) { prev = data[j]; break; }
+        }
+        const u = unit || '';
+        const valStr = cur.toFixed(1) + u;
+        if (prev === null) return ` ${ds.label}: ${valStr}`;
+        const delta = cur - prev;
+        const arrow = delta > 0.05 ? '↑' : delta < -0.05 ? '↓' : '→';
+        const sign  = delta > 0 ? '+' : '';
+        return ` ${ds.label}: ${valStr}   ${arrow} ${sign}${delta.toFixed(1)}${u}`;
+      }
+    }
+  };
+}
+
+
 Chart.defaults.color = TICK;
 Chart.defaults.font.family = "'Space Mono', monospace";
 Chart.defaults.font.size   = 10;
@@ -2596,14 +2668,7 @@ const baseOpts = (yLabel, extra={}) => ({
   interaction: { mode: 'index', intersect: false },
   plugins: {
     legend: { labels: { color: TICK, boxWidth: 12, padding: 16 } },
-    tooltip: {
-      backgroundColor: '#161e19',
-      borderColor: '#1f2e24',
-      borderWidth: 1,
-      titleColor: GREEN,
-      bodyColor: '#d4e8da',
-      padding: 10,
-    }
+    tooltip: makeDeltaTooltipSimple()
   },
   scales: {
     x: {
@@ -2800,7 +2865,7 @@ const ndviOpts = () => ({
   interaction: { mode: 'index', intersect: false },
   plugins: {
     legend: { labels: { color: TICK, boxWidth: 12, padding: 14 } },
-    tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:10 }
+    tooltip: makeDeltaTooltip()
   },
   scales: {
     x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:14, maxRotation:45} },
@@ -2814,7 +2879,7 @@ const ndviOptsSm = () => ({
   interaction: { mode: 'index', intersect: false },
   plugins: {
     legend: { labels: { color: TICK, boxWidth: 10, padding: 10 } },
-    tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:8 }
+    tooltip: makeDeltaTooltip()
   },
   scales: {
     x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:10, maxRotation:45} },
@@ -2881,7 +2946,7 @@ new Chart(document.getElementById('chartCobertura'), {
     responsive:true, animation:{duration:600},
     plugins: {
       legend:{labels:{color:TICK,boxWidth:12,padding:12}},
-      tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}
+      tooltip:makeDeltaTooltip()
     },
     scales: {
       x:{ stacked:true, grid:{color:GRID}, ticks:{color:TICK} },
@@ -2909,7 +2974,7 @@ new Chart(document.getElementById('chartStd'), {
     interaction:{mode:'index',intersect:false},
     plugins:{
       legend:{labels:{color:TICK,boxWidth:12,padding:14}},
-      tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}
+      tooltip:makeDeltaTooltip()
     },
     scales:{
       x:{grid:{color:GRID},ticks:{color:TICK,maxTicksLimit:14,maxRotation:45}},
@@ -2952,7 +3017,7 @@ const corrOpts = (yLabel) => ({
   interaction: { mode: 'index', intersect: false },
   plugins: {
     legend: { labels: { color: TICK, boxWidth: 12, padding: 14 } },
-    tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:10 }
+    tooltip: makeDeltaTooltip()
   },
   scales: {
     x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:12, maxRotation:45} },
@@ -3006,7 +3071,7 @@ new Chart(document.getElementById('chartCorrPrec'), {
     interaction: { mode:'index', intersect:false },
     plugins: {
       legend: { labels:{color:TICK, boxWidth:12, padding:14} },
-      tooltip: { backgroundColor:'#161e19', borderColor:'#1f2e24', borderWidth:1, titleColor:GREEN, bodyColor:'#d4e8da', padding:10 }
+      tooltip: makeDeltaTooltip()
     },
     scales: {
       x:      { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:12, maxRotation:45} },
@@ -3042,7 +3107,7 @@ const hOpts = (yLabel, yMax) => ({
   interaction:{mode:'index',intersect:false},
   plugins:{
     legend:{labels:{color:TICK,boxWidth:12,padding:14}},
-    tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}
+    tooltip: makeDeltaTooltip()
   },
   scales:{
     x:{grid:{color:GRID},ticks:{color:TICK,maxTicksLimit:14,maxRotation:45}},
@@ -3094,7 +3159,7 @@ new Chart(document.getElementById('chartHeteroMensal'),{
   },
   options:{
     responsive:true, animation:{duration:600},
-    plugins:{legend:{labels:{color:TICK,boxWidth:12,padding:12}},tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}},
+    plugins:{legend:{labels:{color:TICK,boxWidth:12,padding:12}},tooltip:makeDeltaTooltip()},
     scales:{
       x:{grid:{color:GRID},ticks:{color:TICK}},
       y:{grid:{color:GRID},ticks:{color:TICK},min:0,title:{display:true,text:'STD médio',color:TICK}}
@@ -3117,7 +3182,7 @@ new Chart(document.getElementById('chartHeteroFase'),{
   },
   options:{
     responsive:true, animation:{duration:600},
-    plugins:{legend:{labels:{color:TICK,boxWidth:12,padding:12}},tooltip:{backgroundColor:'#161e19',borderColor:'#1f2e24',borderWidth:1,titleColor:GREEN,bodyColor:'#d4e8da',padding:10}},
+    plugins:{legend:{labels:{color:TICK,boxWidth:12,padding:12}},tooltip:makeDeltaTooltip()},
     scales:{
       x:{stacked:true,grid:{color:GRID},ticks:{color:TICK,maxRotation:30}},
       y:{stacked:true,grid:{color:GRID},max:100,ticks:{color:TICK,callback:v=>v+'%'},title:{display:true,text:'% pixels',color:TICK}}
@@ -3225,16 +3290,10 @@ new Chart(document.getElementById('chartGapFilling'), {
     interaction: { mode: 'index', intersect: false },
     plugins: {
       legend: { labels: { color: TICK, boxWidth: 14, padding: 14 } },
-      tooltip: {
-        backgroundColor: '#161e19', borderColor: '#1f2e24', borderWidth: 1,
-        titleColor: GREEN, bodyColor: '#d4e8da', padding: 10,
-        callbacks: {
-          afterTitle: (items) => {
-            const i = items[0].dataIndex;
-            return gfCloud[i] === 1 ? '☁️ Imagem nublada — valor estimado' : '✅ Imagem válida';
-          }
-        }
-      }
+      tooltip: makeDeltaTooltip((items) => {
+        const i = items[0].dataIndex;
+        return gfCloud[i] === 1 ? '☁️ Imagem nublada — valor estimado' : '✅ Imagem válida';
+      })
     },
     scales: {
       x: { grid: { color: GRID }, ticks: { color: TICK, maxTicksLimit: 16, maxRotation: 45 } },
@@ -3247,85 +3306,6 @@ new Chart(document.getElementById('chartGapFilling'), {
 // ═══════════════════════════════════════════════════════
 // RELATÓRIO EXECUTIVO — CHARTS
 // ═══════════════════════════════════════════════════════
-
-// ── Helper: delta tooltip callback ──
-// Returns a tooltip with current value + Δ vs previous point for each dataset
-function makeDeltaTooltip(extraAfterTitle) {
-  return {
-    backgroundColor: '#0e1a12',
-    borderColor: '#1f2e24',
-    borderWidth: 1,
-    titleColor: GREEN,
-    bodyColor: '#d4e8da',
-    padding: 14,
-    boxPadding: 6,
-    usePointStyle: true,
-    callbacks: {
-      title: (items) => {
-        const label = items[0].label;
-        const extra = extraAfterTitle ? extraAfterTitle(items) : '';
-        return label + (extra ? '\n' + extra : '');
-      },
-      label: (item) => {
-        const ds   = item.chart.data.datasets[item.datasetIndex];
-        const data = ds.data;
-        const i    = item.dataIndex;
-        const cur  = data[i];
-        if (cur === null || cur === undefined) return ` ${ds.label}: —`;
-
-        let prev = null;
-        for (let j = i - 1; j >= 0; j--) {
-          if (data[j] !== null && data[j] !== undefined) { prev = data[j]; break; }
-        }
-
-        const valStr = typeof cur === 'number' ? cur.toFixed(4) : cur;
-        if (prev === null) return ` ${ds.label}: ${valStr}`;
-
-        const delta = cur - prev;
-        const arrow = delta > 0.001 ? '↑' : delta < -0.001 ? '↓' : '→';
-        const sign  = delta > 0 ? '+' : '';
-        return ` ${ds.label}: ${valStr}   ${arrow} ${sign}${delta.toFixed(4)}`;
-      }
-    }
-  };
-}
-
-// Simplified delta tooltip for non-NDVI charts (mm, %, etc.)
-function makeDeltaTooltipSimple(unit) {
-  return {
-    backgroundColor: '#0e1a12',
-    borderColor: '#1f2e24',
-    borderWidth: 1,
-    titleColor: GREEN,
-    bodyColor: '#d4e8da',
-    padding: 14,
-    boxPadding: 6,
-    usePointStyle: true,
-    callbacks: {
-      label: (item) => {
-        const ds   = item.chart.data.datasets[item.datasetIndex];
-        const data = ds.data;
-        const i    = item.dataIndex;
-        const cur  = data[i];
-        if (cur === null || cur === undefined) return ` ${ds.label}: —`;
-
-        let prev = null;
-        for (let j = i - 1; j >= 0; j--) {
-          if (data[j] !== null && data[j] !== undefined) { prev = data[j]; break; }
-        }
-
-        const u = unit || '';
-        const valStr = typeof cur === 'number' ? cur.toFixed(1) + u : cur;
-        if (prev === null) return ` ${ds.label}: ${valStr}`;
-
-        const delta = cur - prev;
-        const arrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '→';
-        const sign  = delta > 0 ? '+' : '';
-        return ` ${ds.label}: ${valStr}   ${arrow} ${sign}${delta.toFixed(1)}${u}`;
-      }
-    }
-  };
-}
 
 // ── Shared base options ──
 const roBase = () => ({
