@@ -6,7 +6,6 @@
 <title>Diário de Bordo — NDVI FarmLab</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230a0f0d'/><rect x='6' y='6' width='52' height='52' rx='8' fill='%23111814'/><text x='32' y='46' font-size='36' text-anchor='middle' font-family='monospace' fill='%233ddc84'>🛰</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet">
-
 <style>
   :root {
     --bg:        #0a0f0d;
@@ -875,6 +874,9 @@
     </button>
     <button class="tab-btn" onclick="switchTab('relatorio', this)">
       <span class="tab-num">11</span>Relatório Executivo<span class="tab-new-badge">NOVO</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('campo', this)">
+      <span class="tab-num">12</span>Visita em Campo<span class="tab-new-badge">NOVO</span>
     </button>
   </nav>
 </header>
@@ -2211,8 +2213,8 @@ for cada_data in todas_as_datas:
   <!-- ═══════════════════════════ TAB 11 — RELATÓRIO EXECUTIVO ═══════════════════════════ -->
   <div id="tab-relatorio" class="tab-panel">
     <div class="section-label">// 11 — Relatório Executivo</div>
-    <h2>Síntese Qualitativa</h2>
-    <p style="color:var(--muted);margin-bottom:8px">Cada inferência é acompanhada do gráfico que a sustenta. Documento estruturado para apresentação.</p>
+    <h2>Síntese Qualitativa para os Responsáveis</h2>
+    <p style="color:var(--muted);margin-bottom:8px">Cada inferência é acompanhada do gráfico que a sustenta. Documento estruturado para apresentação à Jacto / FarmLab e gestores da fazenda.</p>
 
     <!-- CABEÇALHO EXECUTIVO -->
     <div style="background:linear-gradient(135deg,rgba(61,220,132,0.08),rgba(61,220,132,0.02));border:1px solid rgba(61,220,132,0.25);border-radius:12px;padding:24px 28px;margin:20px 0 32px;position:relative;overflow:hidden">
@@ -2276,7 +2278,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight</strong>
+      <strong>💡 Insight para o gestor</strong>
       O satélite mostra que há potencial não explorado nos talhões de Grão. A área tem capacidade de crescimento maior — o dossel nunca chegou perto dos valores da Silagem, mesmo em condições climáticas idênticas. Investigar diferença de fertilidade entre os talhões é o próximo passo prioritário.
     </div>
 
@@ -2301,7 +2303,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight</strong>
+      <strong>💡 Insight para o gestor</strong>
       O déficit hídrico de novembro (−36,8mm) e janeiro (−45,3mm) indica que irrigação suplementar nesses períodos aumentaria o NDVI e reduziria a heterogeneidade entre zonas. Além disso, o monitoramento satelital tem limitação estrutural em regiões tropicais — os meses de plantio e florescimento precisam de complemento via <strong>radar (SAR/Sentinel-1)</strong> ou drones, que atravessam nuvens.
     </div>
 
@@ -2323,7 +2325,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight</strong>
+      <strong>💡 Insight para o gestor</strong>
       O painel de controle completo do manejo 4.0 exige três dados juntos: <strong>NDVI</strong> (biomassa) + <strong>registro de insumos por zona</strong> + <strong>mapa de yield</strong>. Sem os três, qualquer comparação entre sistemas é inconclusiva. Recomenda-se registrar as doses aplicadas por zona nesta safra para cruzamento com o yield de maio.
     </div>
 
@@ -2348,7 +2350,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight</strong>
+      <strong>💡 Insight para o gestor</strong>
       Os talhões Convencionais aplicam insumos uniformemente em áreas com desempenho heterogêneo demonstrado. Isso significa que zonas de alto vigor estão sendo <strong>subnutridas</strong> (poderiam responder a mais insumo) e zonas de baixo vigor recebem insumo que não conseguem converter. A migração para zonas de manejo tem embasamento nos dados satelitais já coletados — <strong>não é hipótese, é evidência</strong>.
     </div>
 
@@ -2383,7 +2385,7 @@ for cada_data in todas_as_datas:
       </div>
     </div>
     <div class="note-box" style="margin-bottom:32px">
-      <strong>💡 Insight</strong>
+      <strong>💡 Insight para o gestor</strong>
       Plataformas de monitoramento NDVI sem validação cruzada com dados climáticos têm risco real de gerar decisões equivocadas. Recomenda-se implementar um <strong>filtro de consistência automático</strong>: quedas abruptas de NDVI sem correspondência em eventos climáticos adversos devem ser marcadas como suspeitas antes de qualquer ação no campo.
     </div>
 
@@ -2452,6 +2454,305 @@ for cada_data in todas_as_datas:
         <span style="color:var(--ndvi)">O que falta é o desfecho — e ele virá com a colheita.</span><br>
         <span style="color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif">NDVI mede biomassa. Yield mede resultado. Eficiência é a razão entre os dois.</span>
       </p>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════ TAB 12 — VISITA EM CAMPO ═══════════════════════════ -->
+  <div id="tab-campo" class="tab-panel">
+    <div class="section-label">// 12 — Visita em Campo</div>
+    <h2>Anotações e Observações de Campo</h2>
+    <p style="color:var(--muted);margin-bottom:28px">Coleta realizada em Abril/2026. Informações obtidas in loco e cruzadas com os dados satelitais analisados anteriormente. Colheita da Silagem iniciada em 11/04/2026.</p>
+
+    <!-- CABEÇALHO DA VISITA -->
+    <div style="background:linear-gradient(135deg,rgba(92,168,224,0.08),rgba(92,168,224,0.02));border:1px solid rgba(92,168,224,0.25);border-radius:12px;padding:24px 28px;margin-bottom:28px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--ndvi),transparent)"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+        <div style="flex:1;min-width:220px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Visita em Campo</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--white)">Abril / 2026</div>
+          <div style="color:var(--muted);font-size:13px;margin-top:4px">Colheita da Silagem iniciada · Colheitadeira S430</div>
+        </div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--blue)">11/Abr</div>
+            <div style="font-size:11px;color:var(--muted)">Início da colheita</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--yellow)">S430</div>
+            <div style="font-size:11px;color:var(--muted)">Colheitadeira c/ GPS</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--ndvi)">3</div>
+            <div style="font-size:11px;color:var(--muted)">Imagens NDVI analisadas</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--red)">⚠️</div>
+            <div style="font-size:11px;color:var(--muted)">Zona crítica identificada</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEÇÃO 1: TERRENO -->
+    <div style="border-left:4px solid var(--blue);padding-left:20px;margin-bottom:12px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Observação 01</div>
+      <h2 style="margin-bottom:8px">O terreno não é uniforme — e isso explica os dados</h2>
+    </div>
+    <p style="margin-bottom:16px">A imagem acompanhada da movimentação da colheitadeira S430 revelou <strong>curvas de nível expressivas dentro do mesmo talhão</strong>. Isso confirma variação topográfica que afeta diretamente drenagem, fertilidade e resposta ao manejo. A topografia é a causa raiz da heterogeneidade espacial que identificamos nos dados NDVI ao longo de toda a safra.</p>
+
+    <div class="card-grid" style="margin-bottom:20px">
+      <div class="card">
+        <h3>🌄 O que a Topografia Causa</h3>
+        <table>
+          <tbody>
+            <tr>
+              <td style="color:var(--blue);font-weight:700;width:100px">Drenagem</td>
+              <td class="muted">Partes baixas acumulam água — risco de encharcamento no evento de 129mm em dez/2025</td>
+            </tr>
+            <tr>
+              <td style="color:var(--blue);font-weight:700">Fertilidade</td>
+              <td class="muted">Nutrientes migram por erosão e lixiviação das partes altas para as baixadas</td>
+            </tr>
+            <tr>
+              <td style="color:var(--blue);font-weight:700">Compactação</td>
+              <td class="muted">Tráfego de máquinas concentrado nas áreas mais planas e acessíveis</td>
+            </tr>
+            <tr>
+              <td style="color:var(--blue);font-weight:700">Vigor vegetal</td>
+              <td class="muted">Baixadas crescem mais rápido — partes altas com solo raso respondem menos ao insumo</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>📊 Conexão com os Dados NDVI</h3>
+        <table>
+          <tbody>
+            <tr>
+              <td class="mono" style="font-size:10px">b1_std alto</td>
+              <td class="muted">Variação de relevo gera vigor diferente por zona</td>
+            </tr>
+            <tr>
+              <td class="mono" style="font-size:10px">16% solo exposto</td>
+              <td class="muted">Áreas de morro com solo mais raso e seco</td>
+            </tr>
+            <tr>
+              <td class="mono" style="font-size:10px">Déficit −45mm</td>
+              <td class="muted">Partes altas sofrem mais — baixadas retêm umidade</td>
+            </tr>
+            <tr>
+              <td class="mono" style="font-size:10px">STD × NDVI +0,53</td>
+              <td class="muted">Zonas de baixada crescem mais rápido que as de morro</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note-box" style="margin-bottom:32px">
+      <strong>💡 Inferência de Campo</strong>
+      As zonas de baixo NDVI que identificamos nos dados correspondem às <strong>partes mais altas do relevo</strong> — solo mais raso, menor capacidade de retenção hídrica e menor resposta ao fertilizante. Não é falha de manejo, é limitação estrutural do terreno. A agricultura 4.0 existe exatamente para compensar isso.
+    </div>
+
+    <!-- SEÇÃO 2: ANÁLISE VISUAL DAS IMAGENS NDVI -->
+    <div style="border-left:4px solid var(--ndvi);padding-left:20px;margin-bottom:12px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Observação 02</div>
+      <h2 style="margin-bottom:8px">Análise Visual das Imagens NDVI — Evolução Temporal</h2>
+    </div>
+    <p style="margin-bottom:20px">Três imagens NDVI foram selecionadas para análise visual detalhada — representando as fases de <strong>estabelecimento</strong>, <strong>crescimento</strong> e <strong>pós-pico</strong>. A paleta de cores vai de vermelho (baixo NDVI / solo exposto) a verde escuro (vegetação densa).</p>
+
+    <!-- IMAGEM 1 -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="band-header" style="margin-bottom:14px">
+        <span class="band-pill b2">Imagem 01 — 12/Nov/2025 · Silagem Conv. · NDVI ~0,42</span>
+        <span style="color:var(--muted);font-size:12px">Fase: Estabelecimento</span>
+      </div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+        <div style="flex:1;min-width:260px">
+          <p>A imagem está predominantemente <strong>laranja e vermelha</strong>, com apenas uma mancha verde no canto inferior central — exatamente o esperado para novembro, com o milho ainda emergindo de forma heterogênea.</p>
+          <p>O <strong>padrão de listras verticais na esquerda</strong> não é aleatório — é o reflexo das curvas de nível e do sentido de plantio acompanhando o relevo. A área vermelha no topo indica solo praticamente exposto. A mancha verde inferior corresponde a uma <strong>baixada com maior retenção de umidade</strong>, onde a planta emergiu mais vigorosa.</p>
+          <div class="note-box" style="padding:10px 14px;font-size:12px;margin-top:12px">
+            <strong>📌 Conexão com dados</strong>
+            Novembro foi identificado como o mês de maior STD em todos os talhões. Esta imagem confirma visualmente por quê — diferentes partes do talhão estão em estágios completamente distintos de emergência.
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;min-width:200px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Distribuição de cores</div>
+          <div class="ndvi-scale">
+            <div class="ndvi-bar">
+              <div class="ndvi-color" style="background:#c0392b"></div>
+              <span class="ndvi-range" style="width:80px">Vermelho</span>
+              <span class="ndvi-name" style="font-size:12px">Solo exposto · morro</span>
+            </div>
+            <div class="ndvi-bar">
+              <div class="ndvi-color" style="background:#e67e22"></div>
+              <span class="ndvi-range" style="width:80px">Laranja</span>
+              <span class="ndvi-name" style="font-size:12px">Veg. baixa · transição</span>
+            </div>
+            <div class="ndvi-bar">
+              <div class="ndvi-color" style="background:#f9e79f"></div>
+              <span class="ndvi-range" style="width:80px">Amarelo</span>
+              <span class="ndvi-name" style="font-size:12px">Emergência inicial</span>
+            </div>
+            <div class="ndvi-bar">
+              <div class="ndvi-color" style="background:#27ae60"></div>
+              <span class="ndvi-range" style="width:80px">Verde</span>
+              <span class="ndvi-name" style="font-size:12px">Baixada · boa umidade</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGEM 2 -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="band-header" style="margin-bottom:14px">
+        <span class="band-pill b1">Imagem 02 — 27/Dez/2025 · Silagem 4.0 · NDVI ~0,667</span>
+        <span style="color:var(--muted);font-size:12px">Fase: Crescimento ativo</span>
+      </div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+        <div style="flex:1;min-width:260px">
+          <p>Um mês e meio depois, a transformação é visível — a imagem <strong>virou predominantemente verde</strong>. O milho cresceu e cobriu o solo. Mas dois elementos persistem e são os mais importantes para a análise:</p>
+          <p><strong style="color:var(--red)">Zona vermelha intensa no canto superior direito</strong> — isolada, bem delimitada, com contorno quase circular. Não é nuvem (o restante está verde e com boa qualidade). É uma área de solo raso ou afloramento rochoso, onde a planta simplesmente não consegue se desenvolver. Corresponde diretamente às partes mais altas do relevo visto na imagem da colheitadeira.</p>
+          <p><strong style="color:var(--yellow)">Zona laranja-pêssego no canto esquerdo</strong> — menos intensa, mas claramente abaixo do restante. Provavelmente uma encosta de drenagem intermediária — nem tão limitante quanto o topo, nem tão produtiva quanto a baixada.</p>
+          <div class="note-box" style="padding:10px 14px;font-size:12px;margin-top:12px">
+            <strong>📌 Conexão com dados</strong>
+            Este é o período de dezembro — o mais chuvoso (320mm). Mesmo com água disponível, a zona vermelha não respondeu. Isso reforça que a limitação é estrutural (solo raso / relevo), não hídrica.
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;min-width:200px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Zonas identificadas</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);border-radius:6px;padding:8px 10px;font-size:12px">
+              <span style="color:var(--red);font-weight:700">🔴 Canto sup. direito</span><br>
+              <span class="muted">Zona crítica — solo raso / morro</span>
+            </div>
+            <div style="background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:6px;padding:8px 10px;font-size:12px">
+              <span style="color:var(--yellow);font-weight:700">🟡 Canto esquerdo</span><br>
+              <span class="muted">Encosta intermediária</span>
+            </div>
+            <div style="background:rgba(61,220,132,0.1);border:1px solid rgba(61,220,132,0.2);border-radius:6px;padding:8px 10px;font-size:12px">
+              <span style="color:var(--ndvi);font-weight:700">🟢 Centro / baixadas</span><br>
+              <span class="muted">Boa cobertura vegetal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGEM 3 -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="band-header" style="margin-bottom:14px">
+        <span class="band-pill b1">Imagem 03 — 20/Fev/2026 · Silagem 4.0 · NDVI ~0,781</span>
+        <span style="color:var(--muted);font-size:12px">Fase: Pós-pico · dossel denso</span>
+      </div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+        <div style="flex:1;min-width:260px">
+          <p>A imagem mais verde das três — período de dossel denso, próximo ao pico de biomassa. Mas dois elementos merecem atenção:</p>
+          <p><strong style="color:var(--red)">A zona vermelha do canto superior direito permanece — exatamente no mesmo lugar.</strong> Mesma forma, mesma posição, mesma intensidade. Essa é a confirmação mais importante de toda a análise visual. Independente do mês, do clima ou do manejo — essa zona não responde ao crescimento da cultura. Isso descarta hipótese de sombra ou artefato. É uma <strong>limitação estrutural permanente</strong>.</p>
+          <p><strong style="color:var(--blue)">A linha diagonal mais escura no centro</strong> — visível também na imagem anterior — pode corresponder a um canal de drenagem natural ou a um caminho de máquinas que gerou compactação ao longo do tempo.</p>
+          <div class="note-box" style="padding:10px 14px;font-size:12px;margin-top:12px">
+            <strong>📌 Confirmação crítica</strong>
+            A zona vermelha persistente em 3 datas distintas (nov, dez, fev) é a prova visual de que existe uma área estruturalmente limitada no talhão. Quando o yield chegar, essa zona provavelmente será a de menor produtividade.
+          </div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;min-width:200px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Elementos persistentes</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);border-radius:6px;padding:8px 10px;font-size:12px">
+              <span style="color:var(--red);font-weight:700">🔴 Mesma zona crítica</span><br>
+              <span class="muted">3ª imagem consecutiva confirmando</span>
+            </div>
+            <div style="background:rgba(92,168,224,0.1);border:1px solid rgba(92,168,224,0.2);border-radius:6px;padding:8px 10px;font-size:12px">
+              <span style="color:var(--blue);font-weight:700">〰️ Linha diagonal</span><br>
+              <span class="muted">Possível canal de drenagem ou trilha de máquinas</span>
+            </div>
+            <div style="background:rgba(61,220,132,0.1);border:1px solid rgba(61,220,132,0.2);border-radius:6px;padding:8px 10px;font-size:12px">
+              <span style="color:var(--ndvi);font-weight:700">🟢 Restante do talhão</span><br>
+              <span class="muted">Verde denso — dossel completo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CADEIA CAUSAL -->
+    <div style="border-left:4px solid var(--yellow);padding-left:20px;margin-bottom:12px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--yellow);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Síntese</div>
+      <h2 style="margin-bottom:8px">Cadeia Causal Identificada</h2>
+    </div>
+    <p style="margin-bottom:20px">A combinação da imagem topográfica da colheitadeira com as três imagens NDVI permitiu construir uma cadeia causal completa — do relevo até a produtividade esperada.</p>
+
+    <div class="card" style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:0">
+        <div style="background:rgba(224,92,92,0.1);border:1px solid rgba(224,92,92,0.3);border-radius:8px;padding:14px 16px;text-align:center;flex:1;min-width:120px">
+          <div style="font-size:20px;margin-bottom:6px">⛰️</div>
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--white)">Relevo alto</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Partes altas do talhão</div>
+        </div>
+        <div style="color:var(--muted);font-size:20px;padding:0 6px">→</div>
+        <div style="background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:8px;padding:14px 16px;text-align:center;flex:1;min-width:120px">
+          <div style="font-size:20px;margin-bottom:6px">🪨</div>
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--white)">Solo raso</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Baixa retenção hídrica</div>
+        </div>
+        <div style="color:var(--muted);font-size:20px;padding:0 6px">→</div>
+        <div style="background:rgba(61,220,132,0.08);border:1px solid rgba(61,220,132,0.2);border-radius:8px;padding:14px 16px;text-align:center;flex:1;min-width:120px">
+          <div style="font-size:20px;margin-bottom:6px">📡</div>
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--white)">NDVI baixo</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Confirmado em 3 datas</div>
+        </div>
+        <div style="color:var(--muted);font-size:20px;padding:0 6px">→</div>
+        <div style="background:rgba(92,168,224,0.08);border:1px solid rgba(92,168,224,0.2);border-radius:8px;padding:14px 16px;text-align:center;flex:1;min-width:120px">
+          <div style="font-size:20px;margin-bottom:6px">📊</div>
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--white)">Menor yield</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">A confirmar em mai/2026</div>
+        </div>
+        <div style="color:var(--muted);font-size:20px;padding:0 6px">→</div>
+        <div style="background:rgba(245,147,66,0.1);border:1px solid rgba(245,147,66,0.2);border-radius:8px;padding:14px 16px;text-align:center;flex:1;min-width:120px">
+          <div style="font-size:20px;margin-bottom:6px">🎯</div>
+          <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--white)">Zona 4.0</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px">Manejo diferenciado</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- O QUE ESPERAR DO YIELD -->
+    <div class="card-grid" style="margin-bottom:24px">
+      <div class="card">
+        <h3>⏳ O que aguardar do Yield (Mai/2026)</h3>
+        <p>O mapa de produtividade gerado pela colheitadeira S430 será o dado que <strong>fecha o ciclo</strong> desta análise. O cruzamento mais importante:</p>
+        <table style="margin-top:12px">
+          <tbody>
+            <tr><td style="color:var(--ndvi)">Camada 1</td><td class="muted">Zonas de baixo NDVI (nosso mapa)</td></tr>
+            <tr><td style="color:var(--blue)">Camada 2</td><td class="muted">Zonas de baixa produtividade (yield)</td></tr>
+            <tr><td style="color:var(--yellow)">Camada 3</td><td class="muted">Curvas de nível (imagem topográfica)</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box" style="margin-top:12px;padding:10px 14px;font-size:12px">
+          <strong>Se as três camadas coincidirem</strong> — e há grande probabilidade — teremos a prova de que o NDVI prediz a produtividade e que a topografia é a variável de controle.
+        </div>
+      </div>
+      <div class="card">
+        <h3>🎓 Contribuição para o TCC</h3>
+        <p>As imagens NDVI analisadas visualmente aqui são o ponto de partida perfeito para uma CNN. O modelo poderia aprender a:</p>
+        <table style="margin-top:12px">
+          <tbody>
+            <tr><td style="color:var(--ndvi)">Classificar</td><td class="muted">Zonas de vigor automaticamente pela cor e textura</td></tr>
+            <tr><td style="color:var(--yellow)">Detectar</td><td class="muted">Zonas que não evoluem com o restante do talhão</td></tr>
+            <tr><td style="color:var(--blue)">Predizer</td><td class="muted">Produtividade por zona com base nas imagens NDVI</td></tr>
+          </tbody>
+        </table>
+        <div class="note-box" style="margin-top:12px;padding:10px 14px;font-size:12px">
+          <strong>196 imagens reais de 4 talhões</strong> com labels de NDVI e (em breve) yield — dataset de aplicação industrial real para treinar a CNN.
+        </div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <strong>📋 Conclusão da Visita em Campo</strong>
+      A visita confirmou o que os dados já indicavam: a <strong>heterogeneidade topográfica é a variável de controle</strong> da variabilidade de NDVI e, provavelmente, da produtividade. A zona vermelha persistente no canto superior direito das imagens NDVI — visível em novembro, dezembro e fevereiro — é a assinatura satelital de uma limitação física real do terreno. Essa zona não responde ao manejo porque o problema não é de manejo — é de solo e relevo. O próximo passo é sobrepor o mapa de yield com o mapa de <code>b1_std</code> e as curvas de nível para transformar essa hipótese em prova definitiva.
     </div>
 
   </div>
