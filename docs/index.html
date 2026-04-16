@@ -814,6 +814,60 @@
 
   .file-name { color: var(--white); font-family: 'Space Mono', monospace; font-size: 11px; }
   .file-desc { color: var(--muted); font-size: 12px; margin-left: auto; }
+
+  /* ── IMAGE FORMATTING (Imagens nas postagens) ── */
+  .log-image {
+    display: block;
+    max-width: 100%;
+    margin: 0 auto 20px; /* O "0 auto" é o que centraliza a imagem horizontalmente */
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    cursor: zoom-in; /* Altera o cursor para a lupa indicando que é clicável */
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .log-image:hover {
+    transform: translateY(-2px);
+    border-color: var(--ndvi-dim);
+  }
+
+  /* ── LIGHTBOX MODAL (Tela cheia) ── */
+  .lightbox-modal {
+    display: none; /* Escondido por padrão */
+    position: fixed;
+    z-index: 999; /* Fica por cima do seu header e da dev-bar */
+    inset: 0;
+    background: rgba(10, 15, 13, 0.92); /* Usa a cor de fundo do seu projeto */
+    backdrop-filter: blur(8px);
+    padding: 40px;
+    cursor: zoom-out;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .lightbox-modal.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .lightbox-content {
+    width: 90vw;  
+    height: 90vh; 
+    object-fit: contain; 
+  
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .lightbox-modal.active .lightbox-content {
+    transform: scale(1);
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
@@ -2497,6 +2551,29 @@ for cada_data in todas_as_datas:
     <!-- SEÇÃO 1: TERRENO -->
     <div style="border-left:4px solid var(--blue);padding-left:20px;margin-bottom:12px">
       <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Observação 01</div>
+      <img 
+  src="C:\Users\Aula\Diario-de-Bordo-NDVI-FarmLab\img\IMG_CAMPO.webp" 
+  alt="Mapa de curvas de nível" 
+  class="log-image" 
+  onclick="openLightbox(this.src)"
+>
+
+<script>
+  function openLightbox(src) {
+    const modal = document.getElementById('imageLightbox');
+    const modalImg = document.getElementById('lightboxImg');
+    modalImg.src = src; // Passa a URL da imagem clicada para o modal
+    modal.classList.add('active'); // Mostra o modal
+    document.body.style.overflow = 'hidden'; // Evita que a página role no fundo
+  }
+
+  function closeLightbox() {
+    const modal = document.getElementById('imageLightbox');
+    modal.classList.remove('active'); // Esconde o modal
+    document.body.style.overflow = ''; // Restaura a rolagem da página
+  }
+</script>
+
       <h2 style="margin-bottom:8px">O terreno não é uniforme — e isso explica os dados</h2>
     </div>
     <p style="margin-bottom:16px">A imagem acompanhada da movimentação da colheitadeira S430 revelou <strong>curvas de nível expressivas dentro do mesmo talhão</strong>. Isso confirma variação topográfica que afeta diretamente drenagem, fertilidade e resposta ao manejo. A topografia é a causa raiz da heterogeneidade espacial que identificamos nos dados NDVI ao longo de toda a safra.</p>
@@ -2557,6 +2634,7 @@ for cada_data in todas_as_datas:
 
     <!-- SEÇÃO 2: ANÁLISE VISUAL DAS IMAGENS NDVI -->
     <div style="border-left:4px solid var(--ndvi);padding-left:20px;margin-bottom:12px">
+      
       <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Observação 02</div>
       <h2 style="margin-bottom:8px">Análise Visual das Imagens NDVI — Evolução Temporal</h2>
     </div>
@@ -2564,7 +2642,14 @@ for cada_data in todas_as_datas:
 
     <!-- IMAGEM 1 -->
     <div class="card" style="margin-bottom:16px">
+      <img 
+  src="../img/NDV_12025-11-12.webp" 
+  alt="Mapa de curvas de nível" 
+  class="log-image" 
+  onclick="openLightbox(this.src)"
+>
       <div class="band-header" style="margin-bottom:14px">
+        
         <span class="band-pill b2">Imagem 01 — 12/Nov/2025 · Silagem Conv. · NDVI ~0,42</span>
         <span style="color:var(--muted);font-size:12px">Fase: Estabelecimento</span>
       </div>
@@ -2607,6 +2692,12 @@ for cada_data in todas_as_datas:
 
     <!-- IMAGEM 2 -->
     <div class="card" style="margin-bottom:16px">
+      <img 
+  src="../img/NDV_12025-12-27.webp" 
+  alt="Mapa de curvas de nível" 
+  class="log-image" 
+  onclick="openLightbox(this.src)"
+>
       <div class="band-header" style="margin-bottom:14px">
         <span class="band-pill b1">Imagem 02 — 27/Dez/2025 · Silagem 4.0 · NDVI ~0,667</span>
         <span style="color:var(--muted);font-size:12px">Fase: Crescimento ativo</span>
@@ -2643,6 +2734,12 @@ for cada_data in todas_as_datas:
 
     <!-- IMAGEM 3 -->
     <div class="card" style="margin-bottom:24px">
+      <img 
+  src="../img/NDV_12026-02-20.webp" 
+  alt="Mapa de curvas de nível" 
+  class="log-image" 
+  onclick="openLightbox(this.src)"
+>
       <div class="band-header" style="margin-bottom:14px">
         <span class="band-pill b1">Imagem 03 — 20/Fev/2026 · Silagem 4.0 · NDVI ~0,781</span>
         <span style="color:var(--muted);font-size:12px">Fase: Pós-pico · dossel denso</span>
@@ -3807,5 +3904,8 @@ new Chart(document.getElementById('relChart5'), {
 
 
 </script>
+<div id="imageLightbox" class="lightbox-modal" onclick="closeLightbox()">
+  <img id="lightboxImg" class="lightbox-content" src="" alt="Imagem ampliada">
+</div>
 </body>
 </html>
