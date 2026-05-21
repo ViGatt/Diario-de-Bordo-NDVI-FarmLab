@@ -932,6 +932,9 @@
     <button class="tab-btn" onclick="switchTab('campo', this)">
       <span class="tab-num">12</span>Visita em Campo<span class="tab-new-badge">NOVO</span>
     </button>
+    <button class="tab-btn" onclick="switchTab('laudo', this)">
+      <span class="tab-num">13</span>Laudo Técnico<span class="tab-new-badge">NOVO</span>
+    </button>
   </nav>
 </header>
 
@@ -2854,6 +2857,395 @@ for cada_data in todas_as_datas:
 
   </div>
 
+  <!-- ═══════════════════════════ TAB 13 — LAUDO TÉCNICO ═══════════════════════════ -->
+  <div id="tab-laudo" class="tab-panel">
+    <div class="section-label">// 13 — Laudo Técnico</div>
+    <h2>Avaliação Agronômica por Sensoriamento Remoto</h2>
+    <p style="color:var(--muted);margin-bottom:8px">Safra de Milho 2025–2026 · Jacto / FarmLab · Sentinel-2 (ESA) · Estação Metos Pro</p>
+
+    <!-- CABEÇALHO IDENTIFICAÇÃO -->
+    <div style="background:linear-gradient(135deg,rgba(61,220,132,0.07),rgba(61,220,132,0.02));border:1px solid rgba(61,220,132,0.2);border-radius:12px;padding:22px 26px;margin:20px 0 28px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--ndvi),var(--blue),transparent)"></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Identificação</div>
+          <table style="margin:0">
+            <tbody>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Cultura</td><td style="font-size:13px;padding:3px 0">Milho (Zea mays)</td></tr>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Safra</td><td style="font-size:13px;padding:3px 0">Safrinha 2025–2026</td></tr>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Período</td><td style="font-size:13px;padding:3px 0">Ago/2025 – Abr/2026</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Fontes</div>
+          <table style="margin:0">
+            <tbody>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Satélite</td><td style="font-size:13px;padding:3px 0">Sentinel-2 (ESA) · 10m/px</td></tr>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Clima</td><td style="font-size:13px;padding:3px 0">Metos Pro · 0020ED51</td></tr>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Plataforma</td><td style="font-size:13px;padding:3px 0">One Soil / Jacto FarmLab</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px">Volume de Dados</div>
+          <table style="margin:0">
+            <tbody>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Imagens</td><td style="font-size:13px;padding:3px 0">196 GeoTIFF (49 datas × 4)</td></tr>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Colunas CSV</td><td style="font-size:13px;padding:3px 0">75 variáveis por registro</td></tr>
+              <tr><td style="color:var(--muted);font-size:12px;padding:3px 12px 3px 0">Registros Metos</td><td style="font-size:13px;padding:3px 0">2.785 registros horários</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SEÇÃO 1: CONTEXTO CLIMÁTICO ══ -->
+    <div style="border-left:4px solid var(--blue);padding-left:20px;margin-bottom:12px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Seção 01</div>
+      <h2 style="margin-bottom:8px">Contexto Climático da Safra</h2>
+    </div>
+    <p style="margin-bottom:16px">O regime pluviométrico da safra 2025–2026 foi marcado por distribuição temporal heterogênea — dois meses de superávit expressivo intercalados com dois meses de déficit hídrico em fases agronômicas críticas. O evento de 129,4 mm em 09/12/2025 representa o maior registro isolado e gerou risco real de lixiviação de nutrientes recém-aplicados. O déficit de −45,3 mm em janeiro coincidiu com o florescimento — fase fisiologicamente mais sensível ao estresse hídrico no milho.</p>
+
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b2">Balanço Hídrico Mensal · Precipitação vs. ETo</span>
+        <span style="color:var(--muted);font-size:12px">Verde = superávit · Vermelho = déficit</span>
+      </div>
+      <canvas id="laudoChart1" height="110"></canvas>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:16px">
+        <div style="background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.2);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">⚠️ Nov/2025 — Déficit</div>
+          <p style="font-size:12px;margin:0;color:var(--text)">Fase de estabelecimento. Plantas emergindo com menor suporte hídrico nas áreas de solo mais raso, acentuando a variabilidade de vigor.</p>
+        </div>
+        <div style="background:rgba(61,220,132,0.06);border:1px solid rgba(61,220,132,0.15);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">✅ Dez/2025 — Superávit</div>
+          <p style="font-size:12px;margin:0;color:var(--text)">+179,9 mm. Evento extremo de 129,4 mm em 09/12 gerou risco de encharcamento em baixadas e lixiviação nas encostas. 67% das imagens perdidas por nuvens.</p>
+        </div>
+        <div style="background:rgba(224,92,92,0.08);border:1px solid rgba(224,92,92,0.2);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">⚠️ Jan/2026 — Déficit Crítico</div>
+          <p style="font-size:12px;margin:0;color:var(--text)">−45,3 mm durante o florescimento. Possível impacto no enchimento de grãos não detectável pelo NDVI foliar. Pico vegetativo atingido mesmo com déficit.</p>
+        </div>
+        <div style="background:rgba(61,220,132,0.06);border:1px solid rgba(61,220,132,0.15);border-radius:8px;padding:12px">
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">✅ Fev/2026 — Superávit</div>
+          <p style="font-size:12px;margin:0;color:var(--text)">+129 mm. Evento de 91,4 mm em 08/02 comprometeu as imagens NDVI #2 (apenas 40% de aproveitamento). Favoreceu enchimento de grãos.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUALIDADE DOS DADOS -->
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b2">Qualidade do Conjunto de Dados · Aproveitamento por Mês</span>
+        <span style="color:var(--muted);font-size:12px">39,3% das imagens inutilizadas por nuvens</span>
+      </div>
+      <canvas id="laudoChart2" height="100"></canvas>
+      <div class="note-box" style="margin-top:16px">
+        <strong>📌 Interpretação</strong>
+        Outubro (plantio) e dezembro (chuvas extremas) foram os meses mais críticos — justamente quando o monitoramento é mais necessário. Janeiro compensou com 84,4% de aproveitamento e capturou o pico universal em 16/jan/2026. A anomalia de 11/jan foi identificada por cruzamento com dados climáticos: clima favorável + NDVI de solo exposto nos talhões de grão = nuvem parcial não mascarada pela Banda 2 do Sentinel-2.
+      </div>
+    </div>
+
+    <!-- ══ SEÇÃO 2: AVALIAÇÃO POR TALHÃO ══ -->
+    <div style="border-left:4px solid var(--ndvi);padding-left:20px;margin-bottom:12px;margin-top:32px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Seção 02</div>
+      <h2 style="margin-bottom:8px">Avaliação Individual por Talhão</h2>
+    </div>
+    <p style="margin-bottom:24px">Cada talhão é analisado com base nos indicadores NDVI, heterogeneidade espacial, resposta ao clima e comportamento fenológico. Os gráficos confirmam visualmente cada inferência.</p>
+
+    <!-- TALHÃO SILAGEM 4.0 -->
+    <div style="background:rgba(61,220,132,0.04);border:1px solid rgba(61,220,132,0.2);border-radius:12px;padding:22px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-family:'Space Mono',monospace;font-size:9px;background:rgba(61,220,132,0.15);color:var(--ndvi);padding:4px 10px;border-radius:4px;border:1px solid rgba(61,220,132,0.3);letter-spacing:1px">f791bf13</span>
+        <h3 style="margin:0;font-size:18px">Silagem 4.0</h3>
+        <span style="margin-left:auto;background:rgba(61,220,132,0.15);color:var(--ndvi);font-family:'Space Mono',monospace;font-size:10px;padding:4px 12px;border-radius:4px;border:1px solid rgba(61,220,132,0.3)">MELHOR DESEMPENHO</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+        <div class="stat-pill"><span class="stat-value">0,516</span><span class="stat-label">NDVI médio safra</span></div>
+        <div class="stat-pill"><span class="stat-value">0,839</span><span class="stat-label">Pico NDVI (16/jan)</span></div>
+        <div class="stat-pill"><span class="stat-value">82,2%</span><span class="stat-label">Pixels densos no pico</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--yellow)">0,186</span><span class="stat-label">b1_std médio</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--blue)">−0,181</span><span class="stat-label">Corr. STD×NDVI</span></div>
+      </div>
+      <canvas id="laudoChartSil40" height="120" style="margin-bottom:14px"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">✅ Prós</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Maior NDVI médio da safra (0,516)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Pico vegetativo mais alto (0,839)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">82,2% de cobertura densa no pico</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Convergência para uniformidade no pico (STD×NDVI negativo)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Zonas de manejo diferenciado funcionando como esperado</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">⚠️ Contras</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Zona crítica estrutural persistente (canto sup. direito)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">STD elevado em novembro — emergência desuniforme</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">19 imagens perdidas por nuvens</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Queda em 05/fev — possível contaminação ou estresse</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Encosta intermediária com vigor reduzido persistente</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-box" style="margin:0">
+        <strong>📌 Interpretação agronômica</strong>
+        A zona vermelha persistente identificada nas imagens NDVI de novembro, dezembro e fevereiro corresponde à parte mais elevada do relevo — solo raso, menor retenção hídrica e menor resposta ao insumo aplicado. Essa limitação é estrutural e não é corrigível pelo manejo atual. A correlação negativa STD×NDVI confirma que as zonas diferenciadas convergiram para alto vigor no pico — o manejo 4.0 funcionou para elevar as zonas de menor potencial.
+      </div>
+    </div>
+
+    <!-- TALHÃO SILAGEM CONV -->
+    <div style="background:rgba(92,168,224,0.04);border:1px solid rgba(92,168,224,0.2);border-radius:12px;padding:22px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-family:'Space Mono',monospace;font-size:9px;background:rgba(92,168,224,0.15);color:var(--blue);padding:4px 10px;border-radius:4px;border:1px solid rgba(92,168,224,0.3);letter-spacing:1px">0bf86c8b</span>
+        <h3 style="margin:0;font-size:18px">Silagem Convencional</h3>
+        <span style="margin-left:auto;background:rgba(92,168,224,0.12);color:var(--blue);font-family:'Space Mono',monospace;font-size:10px;padding:4px 12px;border-radius:4px;border:1px solid rgba(92,168,224,0.3)">DESEMPENHO CONSISTENTE</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+        <div class="stat-pill"><span class="stat-value" style="color:var(--blue)">0,499</span><span class="stat-label">NDVI médio safra</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--blue)">0,827</span><span class="stat-label">Pico NDVI (16/jan)</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--blue)">75,0%</span><span class="stat-label">Pixels densos no pico</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--blue)">0,158</span><span class="stat-label">b1_std médio</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--blue)">−0,187</span><span class="stat-label">Corr. STD×NDVI</span></div>
+      </div>
+      <canvas id="laudoChartSilC" height="120" style="margin-bottom:14px"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">✅ Prós</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Segundo maior pico NDVI da safra (0,827)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">STD menor — resposta mais homogênea ao insumo</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Curva fenológica consistente, sem anomalias estruturais</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">75% de cobertura densa no pico</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">⚠️ Contras</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Manejo uniforme não compensa variação interna de solo</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">NDVI 3,3% inferior à Silagem 4.0</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">20 imagens perdidas por nuvens (maior número)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Insumo possivelmente mal alocado por ausência de zonas</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-box" style="margin:0">
+        <strong>📌 Interpretação agronômica</strong>
+        O menor STD reflete a aplicação homogênea de insumo — não necessariamente uniformidade real de resposta. As diferenças internas existem no solo, mas o manejo uniforme não as amplifica. O resultado é uma aparente maior uniformidade que pode mascarar zonas de desperdício (insumo aplicado onde o solo não tem capacidade de resposta) e zonas subalimentadas (alto potencial não explorado).
+      </div>
+    </div>
+
+    <!-- TALHÃO GRÃO CONV -->
+    <div style="background:rgba(245,200,66,0.04);border:1px solid rgba(245,200,66,0.2);border-radius:12px;padding:22px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-family:'Space Mono',monospace;font-size:9px;background:rgba(245,200,66,0.12);color:var(--yellow);padding:4px 10px;border-radius:4px;border:1px solid rgba(245,200,66,0.25);letter-spacing:1px">b7292cb8</span>
+        <h3 style="margin:0;font-size:18px">Grão Convencional</h3>
+        <span style="margin-left:auto;background:rgba(245,200,66,0.1);color:var(--yellow);font-family:'Space Mono',monospace;font-size:10px;padding:4px 12px;border-radius:4px;border:1px solid rgba(245,200,66,0.2)">HETEROGENEIDADE CRESCENTE</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+        <div class="stat-pill"><span class="stat-value" style="color:var(--yellow)">0,438</span><span class="stat-label">NDVI médio safra</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--yellow)">0,762</span><span class="stat-label">Pico NDVI (16/jan)</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--yellow)">66,7%</span><span class="stat-label">Pixels densos no pico</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--yellow)">0,143</span><span class="stat-label">b1_std médio</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--red)">+0,437</span><span class="stat-label">Corr. STD×NDVI</span></div>
+      </div>
+      <canvas id="laudoChartGC" height="120" style="margin-bottom:14px"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">✅ Prós</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Maior NDVI médio entre os talhões de grão (0,438)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Menor percentual de solo exposto vs. Grão 4.0 (13,1%)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Curva fenológica sem anomalias estruturais</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">⚠️ Contras</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Correlação STD×NDVI positiva (+0,437) — zonas não gerenciadas</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Heterogeneidade interna crescente com o desenvolvimento</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Anomalia de 11/jan (NDVI 0,2496) exigiu tratamento</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Insumo desperdiçado nas zonas de baixo potencial</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-box" style="margin:0">
+        <strong>📌 Interpretação agronômica</strong>
+        A correlação positiva STD×NDVI (+0,437) indica que diferentes zonas do talhão cresceram em ritmos distintos ao longo da safra — variabilidade interna não gerenciada pelo manejo uniforme. Esse padrão é exatamente o que justifica a implementação de zonas de manejo: o talhão já demonstrou, via satélite, onde estão suas áreas de alto e baixo potencial produtivo.
+      </div>
+    </div>
+
+    <!-- TALHÃO GRÃO 4.0 -->
+    <div style="background:rgba(245,147,66,0.04);border:1px solid rgba(245,147,66,0.2);border-radius:12px;padding:22px;margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-family:'Space Mono',monospace;font-size:9px;background:rgba(245,147,66,0.12);color:#f59342;padding:4px 10px;border-radius:4px;border:1px solid rgba(245,147,66,0.25);letter-spacing:1px">258e47e0</span>
+        <h3 style="margin:0;font-size:18px">Grão 4.0</h3>
+        <span style="margin-left:auto;background:rgba(245,147,66,0.1);color:#f59342;font-family:'Space Mono',monospace;font-size:10px;padding:4px 12px;border-radius:4px;border:1px solid rgba(245,147,66,0.2)">YIELD PENDENTE</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+        <div class="stat-pill"><span class="stat-value" style="color:#f59342">0,413</span><span class="stat-label">NDVI médio safra</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:#f59342">0,755</span><span class="stat-label">Pico NDVI (16/jan)</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:#f59342">62,1%</span><span class="stat-label">Pixels densos no pico</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--red)">16,6%</span><span class="stat-label">Solo exposto médio</span></div>
+        <div class="stat-pill"><span class="stat-value" style="color:var(--red)">+0,532</span><span class="stat-label">Corr. STD×NDVI</span></div>
+      </div>
+      <canvas id="laudoChartG40" height="120" style="margin-bottom:14px"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--ndvi);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">✅ Prós</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Menor perda de imagens por nuvens (18 de 49)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">STD×NDVI revela diferenciação efetiva de zonas</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(61,220,132,0.06);border-radius:5px;border-left:3px solid var(--ndvi)">Potencialmente maior eficiência de insumo por zona</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">⚠️ Contras</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:5px">
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Menor NDVI médio da safra (0,413)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Maior percentual de solo exposto (16,6%)</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Apenas 62,1% de pixels densos no pico</li>
+            <li style="font-size:13px;color:var(--text);padding:5px 10px;background:rgba(224,92,92,0.06);border-radius:5px;border-left:3px solid var(--red)">Avaliação definitiva pendente do mapa de yield (mai/26)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-box" style="margin:0">
+        <strong>📌 Interpretação agronômica</strong>
+        O menor NDVI médio não indica inferioridade agronômica — é o resultado esperado de um manejo que reduz insumo nas zonas de baixo potencial. A correlação mais alta STD×NDVI (+0,532) confirma diferenciação crescente entre zonas ao longo da safra. A avaliação real exige o cruzamento de NDVI + doses aplicadas por zona + mapa de yield. <strong>NDVI mede biomassa; eficiência agronômica se mede pela produtividade por real investido.</strong>
+      </div>
+    </div>
+
+    <!-- ══ SEÇÃO 3: COMPARATIVO ══ -->
+    <div style="border-left:4px solid var(--yellow);padding-left:20px;margin-bottom:12px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--yellow);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Seção 03</div>
+      <h2 style="margin-bottom:8px">Análise Comparativa e Correlações</h2>
+    </div>
+
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b1">Desempenho Vegetativo — NDVI Médio da Safra e Pico</span>
+      </div>
+      <canvas id="laudoChart3" height="110"></canvas>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;text-align:center">
+        <div style="padding:8px;background:rgba(61,220,132,0.08);border-radius:6px;border:1px solid rgba(61,220,132,0.2)">
+          <div style="font-size:11px;color:var(--ndvi);font-weight:700">Silagem 4.0</div>
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--white)">0,516</div>
+          <div style="font-size:10px;color:var(--muted)">🥇 1º lugar</div>
+        </div>
+        <div style="padding:8px;background:rgba(92,168,224,0.08);border-radius:6px;border:1px solid rgba(92,168,224,0.2)">
+          <div style="font-size:11px;color:var(--blue);font-weight:700">Silagem Conv.</div>
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--white)">0,499</div>
+          <div style="font-size:10px;color:var(--muted)">🥈 2º lugar</div>
+        </div>
+        <div style="padding:8px;background:rgba(245,200,66,0.08);border-radius:6px;border:1px solid rgba(245,200,66,0.2)">
+          <div style="font-size:11px;color:var(--yellow);font-weight:700">Grão Conv.</div>
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--white)">0,438</div>
+          <div style="font-size:10px;color:var(--muted)">🥉 3º lugar</div>
+        </div>
+        <div style="padding:8px;background:rgba(245,147,66,0.08);border-radius:6px;border:1px solid rgba(245,147,66,0.2)">
+          <div style="font-size:11px;color:#f59342;font-weight:700">Grão 4.0</div>
+          <div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--white)">0,413</div>
+          <div style="font-size:10px;color:var(--muted)">⏳ Yield pendente</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b2">Correlação NDVI × Variáveis Climáticas — Pearson (r)</span>
+        <span style="color:var(--muted);font-size:12px">Verde = positiva · Vermelho = negativa</span>
+      </div>
+      <canvas id="laudoChart4" height="120"></canvas>
+      <div class="note-box" style="margin-top:14px">
+        <strong>📌 Interpretação</strong>
+        A <strong>umidade relativa</strong> é a variável climática com maior correlação positiva com o NDVI (r até +0,40) — dias mais úmidos coincidem com maior vigor vegetativo. A <strong>radiação solar</strong> apresenta correlação negativa porque os dias mais ensolarados coincidiram com as fases secas (agosto–setembro e janeiro com déficit). A <strong>temperatura</strong> teve influência mínima — permaneceu dentro da faixa ótima do milho (20–35°C) durante toda a safra. O NDVI foi primariamente controlado pela <strong>fenologia</strong>, não pelo clima isoladamente.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="band-header" style="margin-bottom:12px">
+        <span class="band-pill b3">Distribuição de Vigor no Pico — 16/Jan/2026</span>
+        <span style="color:var(--muted);font-size:12px">% pixels por classe de cobertura</span>
+      </div>
+      <canvas id="laudoChart5" height="110"></canvas>
+      <div class="note-box" style="margin-top:14px">
+        <strong>📌 Interpretação</strong>
+        No pico universal de 16/jan/2026, a <strong>Silagem 4.0</strong> atingiu 82,2% de pixels em vegetação densa — a maior cobertura de dossel registrada. Os talhões de Grão ficaram entre 62,1% e 66,7%, refletindo não apenas a biologia distinta dos cultivares, mas também a influência da topografia nas zonas de menor potencial. A presença de solo exposto nos talhões de Grão (3,4%) mesmo no pico confirma zonas estruturalmente limitadas.
+      </div>
+    </div>
+
+    <!-- ══ SEÇÃO 4: RECOMENDAÇÕES ══ -->
+    <div style="border-left:4px solid var(--red);padding-left:20px;margin-bottom:12px;margin-top:32px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--red);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Seção 04</div>
+      <h2 style="margin-bottom:8px">Recomendações Técnicas</h2>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr><th>Recomendação</th><th>Justificativa</th><th>Talhões</th><th>Prioridade</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Cruzar yield com STD e curvas de nível</strong></td>
+            <td class="muted">Confirmar cadeia causal: relevo → NDVI → produtividade</td>
+            <td class="muted">Todos</td>
+            <td><span style="color:var(--red);font-weight:700">Alta</span></td>
+          </tr>
+          <tr>
+            <td><strong>Análise de solo por zonas de vigor</strong></td>
+            <td class="muted">Identificar se limitação é pedológica, química ou física</td>
+            <td class="muted">Sil. 4.0, Grão Conv.</td>
+            <td><span style="color:var(--red);font-weight:700">Alta</span></td>
+          </tr>
+          <tr>
+            <td><strong>Filtro climático no pipeline NDVI</strong></td>
+            <td class="muted">Evitar falsos alarmes por nuvens parciais não mascaradas</td>
+            <td class="muted">Grão Conv., Grão 4.0</td>
+            <td><span style="color:var(--red);font-weight:700">Alta</span></td>
+          </tr>
+          <tr>
+            <td><strong>Registrar doses por zona de manejo</strong></td>
+            <td class="muted">Permitir análise de eficiência insumo × yield</td>
+            <td class="muted">Sil. 4.0, Grão 4.0</td>
+            <td><span style="color:var(--red);font-weight:700">Alta</span></td>
+          </tr>
+          <tr>
+            <td><strong>Complementar com radar SAR (Sentinel-1)</strong></td>
+            <td class="muted">Garantir cobertura em outubro e dezembro — meses críticos</td>
+            <td class="muted">Todos</td>
+            <td><span style="color:var(--yellow);font-weight:700">Média</span></td>
+          </tr>
+          <tr>
+            <td><strong>Avaliar irrigação suplementar</strong></td>
+            <td class="muted">Déficits de nov (−36,8mm) e jan (−45,3mm) em fases críticas</td>
+            <td class="muted">Todos</td>
+            <td><span style="color:var(--yellow);font-weight:700">Média</span></td>
+          </tr>
+          <tr>
+            <td><strong>Migrar Talhões Conv. para zonas 4.0</strong></td>
+            <td class="muted">STD crescente com NDVI comprova variabilidade interna não gerenciada</td>
+            <td class="muted">Sil. Conv., Grão Conv.</td>
+            <td><span style="color:var(--ndvi);font-weight:700">Planejamento</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CONCLUSÃO FINAL -->
+    <div style="background:linear-gradient(135deg,rgba(61,220,132,0.06),rgba(92,168,224,0.04));border:1px solid rgba(61,220,132,0.18);border-radius:12px;padding:28px;text-align:center;margin-top:8px">
+      <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px">Conclusão do Laudo</div>
+      <p style="font-family:'Syne',sans-serif;font-size:15px;color:var(--white);line-height:1.8;max-width:800px;margin:0 auto">
+        O monitoramento por satélite confirmou crescimento vegetativo adequado, identificou a topografia como variável de controle da heterogeneidade e revelou as zonas estruturalmente limitadas de cada talhão.<br>
+        <span style="color:var(--ndvi)">A validação definitiva do manejo 4.0 aguarda os mapas de yield de maio/2026.</span><br>
+        <span style="color:var(--muted);font-size:13px;font-family:'DM Sans',sans-serif;margin-top:8px;display:block">NDVI mede biomassa · Yield mede resultado · Eficiência é a razão entre os dois</span>
+      </p>
+    </div>
+
+  </div>
+
 </main>
 
 <footer>
@@ -3900,10 +4292,253 @@ new Chart(document.getElementById('relChart5'), {
   }
 });
 
+// ═══════════════════════════════════════════════════════
+// LAUDO TÉCNICO — CHARTS
+// ═══════════════════════════════════════════════════════
+
+const lb = () => ({
+  responsive: true,
+  animation: { duration: 600 },
+  interaction: { mode: 'index', intersect: false },
+  plugins: {
+    legend: { labels: { color: TICK, boxWidth: 12, padding: 12 } },
+    tooltip: makeDeltaTooltip()
+  }
+});
+
+// ── Chart 1: Balanço hídrico mensal ──
+new Chart(document.getElementById('laudoChart1'), {
+  type: 'bar',
+  data: {
+    labels: ['Nov/2025','Dez/2025','Jan/2026','Fev/2026'],
+    datasets: [
+      {
+        label: 'Precipitação (mm)',
+        data: [102.2, 320.2, 102.4, 223.4],
+        backgroundColor: 'rgba(92,168,224,0.5)',
+        borderRadius: 4, order: 2, yAxisID: 'yP'
+      },
+      {
+        label: 'ETo (mm)',
+        data: [139.0, 140.3, 147.7, 94.4],
+        backgroundColor: 'rgba(245,200,66,0.45)',
+        borderRadius: 4, order: 2, yAxisID: 'yP'
+      },
+      {
+        label: 'Balanço Hídrico (mm)',
+        data: [-36.8, 179.9, -45.3, 129.0],
+        type: 'line',
+        borderColor: GREEN, backgroundColor: 'transparent',
+        borderWidth: 2.5, pointRadius: 7,
+        pointBackgroundColor: [-36.8, 179.9, -45.3, 129.0].map(v => v >= 0 ? GREEN : RED),
+        tension: 0.3, order: 1, yAxisID: 'yB'
+      }
+    ]
+  },
+  options: {
+    ...lb(),
+    plugins: { ...lb().plugins, tooltip: makeDeltaTooltipSimple(' mm') },
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK} },
+      yP: { position:'left',  grid:{color:GRID}, ticks:{color:BLUE},  title:{display:true,text:'mm',color:BLUE}, min:0 },
+      yB: { position:'right', grid:{drawOnChartArea:false}, ticks:{color:GREEN}, title:{display:true,text:'Balanço',color:GREEN} }
+    }
+  }
+});
+
+// ── Chart 2: Aproveitamento de imagens por mês ──
+new Chart(document.getElementById('laudoChart2'), {
+  type: 'bar',
+  data: {
+    labels: ['Ago/25','Set/25','Out/25','Nov/25','Dez/25','Jan/26','Fev/26'],
+    datasets: [
+      {
+        label: 'Imagens Válidas',
+        data: [20, 24, 8, 24, 8, 27, 8],
+        backgroundColor: 'rgba(61,220,132,0.6)', borderRadius: 4
+      },
+      {
+        label: 'Imagens Nubladas',
+        data: [12, 4, 20, 8, 16, 5, 12],
+        backgroundColor: 'rgba(224,92,92,0.5)', borderRadius: 4
+      }
+    ]
+  },
+  options: {
+    ...lb(),
+    plugins: { ...lb().plugins, tooltip: makeDeltaTooltipSimple('') },
+    scales: {
+      x: { stacked:true, grid:{color:GRID}, ticks:{color:TICK} },
+      y: { stacked:true, grid:{color:GRID}, ticks:{color:TICK}, title:{display:true,text:'Nº de imagens',color:TICK} }
+    }
+  }
+});
+
+// ── Charts 3a-d: NDVI individual por talhão (com STD como banda) ──
+function makeIndividualChart(canvasId, dates, means, stds, color) {
+  const upper = means.map((m,i) => stds[i] ? +(m + stds[i]).toFixed(4) : null);
+  const lower = means.map((m,i) => stds[i] ? +(m - stds[i]).toFixed(4) : null);
+  new Chart(document.getElementById(canvasId), {
+    type: 'line',
+    data: {
+      labels: dates,
+      datasets: [
+        {
+          label: 'NDVI + STD',
+          data: upper,
+          borderColor: 'transparent',
+          backgroundColor: color.replace('1)', '0.12)'),
+          fill: '+1', pointRadius: 0, tension: 0.3
+        },
+        {
+          label: 'NDVI médio',
+          data: means,
+          borderColor: color, borderWidth: 2.5,
+          backgroundColor: 'transparent',
+          pointRadius: means.map(m => m !== null ? 3 : 0),
+          pointBackgroundColor: color, fill: false, tension: 0.3
+        },
+        {
+          label: 'NDVI − STD',
+          data: lower,
+          borderColor: 'transparent',
+          backgroundColor: color.replace('1)', '0.12)'),
+          fill: '-1', pointRadius: 0, tension: 0.3
+        }
+      ]
+    },
+    options: {
+      ...lb(),
+      plugins: { ...lb().plugins, tooltip: makeDeltaTooltip() },
+      scales: {
+        x: { grid:{color:GRID}, ticks:{color:TICK, maxTicksLimit:12, maxRotation:45} },
+        y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1,
+             title:{display:true,text:'NDVI',color:TICK} }
+      }
+    }
+  });
+}
+
+// Silagem 4.0
+makeIndividualChart('laudoChartSil40',
+  sil40Dates, sil40Means, sil40Stds, GREEN);
+
+// Silagem Conv.
+makeIndividualChart('laudoChartSilC',
+  silConvDates, silConvMeans, silConvStds, BLUE);
+
+// Grão Conv.
+makeIndividualChart('laudoChartGC',
+  graoCDates, graoCMeans, graoCStds, YELLOW);
+
+// Grão 4.0
+makeIndividualChart('laudoChartG40',
+  grao40Dates, grao40Means, grao40Stds, ORANGE);
+
+// ── Chart 3: Comparativo NDVI médio e pico ──
+new Chart(document.getElementById('laudoChart3'), {
+  type: 'bar',
+  data: {
+    labels: ['Silagem 4.0','Silagem Conv.','Grão Conv.','Grão 4.0'],
+    datasets: [
+      {
+        label: 'NDVI Médio da Safra',
+        data: [0.516, 0.499, 0.438, 0.413],
+        backgroundColor: [
+          'rgba(61,220,132,0.75)', 'rgba(92,168,224,0.75)',
+          'rgba(245,200,66,0.75)', 'rgba(245,147,66,0.75)'
+        ],
+        borderRadius: 5
+      },
+      {
+        label: 'Pico NDVI',
+        data: [0.839, 0.827, 0.762, 0.755],
+        backgroundColor: [
+          'rgba(61,220,132,0.3)', 'rgba(92,168,224,0.3)',
+          'rgba(245,200,66,0.3)', 'rgba(245,147,66,0.3)'
+        ],
+        borderColor: [GREEN, BLUE, YELLOW, ORANGE],
+        borderWidth: 2,
+        borderRadius: 5
+      }
+    ]
+  },
+  options: {
+    ...lb(),
+    plugins: { ...lb().plugins, tooltip: makeDeltaTooltipSimple('') },
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK} },
+      y: { grid:{color:GRID}, ticks:{color:TICK}, min:0, max:1,
+           title:{display:true,text:'NDVI',color:TICK} }
+    }
+  }
+});
+
+// ── Chart 4: Correlação NDVI × variáveis climáticas ──
+new Chart(document.getElementById('laudoChart4'), {
+  type: 'bar',
+  data: {
+    labels: ['Umidade Rel.','Prec. dia','Prec. 7d','Prec. 14d','Temp. Média','Radiação Solar'],
+    datasets: [
+      {
+        label: 'Silagem 4.0',
+        data: [0.273, 0.173, -0.174, -0.082, -0.073, -0.072],
+        backgroundColor: 'rgba(61,220,132,0.7)', borderRadius: 3
+      },
+      {
+        label: 'Silagem Conv.',
+        data: [0.363, 0.195, -0.189, -0.102, -0.117, -0.315],
+        backgroundColor: 'rgba(92,168,224,0.7)', borderRadius: 3
+      },
+      {
+        label: 'Grão Conv.',
+        data: [0.342, 0.207, -0.191, -0.179, -0.002, -0.212],
+        backgroundColor: 'rgba(245,200,66,0.7)', borderRadius: 3
+      },
+      {
+        label: 'Grão 4.0',
+        data: [0.398, 0.227, -0.069, 0.055, 0.005, -0.266],
+        backgroundColor: 'rgba(245,147,66,0.7)', borderRadius: 3
+      }
+    ]
+  },
+  options: {
+    ...lb(),
+    plugins: { ...lb().plugins, tooltip: makeDeltaTooltipSimple('') },
+    scales: {
+      x: { grid:{color:GRID}, ticks:{color:TICK, maxRotation:20} },
+      y: { grid:{color:GRID}, ticks:{color:TICK}, min:-0.45, max:0.55,
+           title:{display:true,text:'Pearson (r)',color:TICK} }
+    }
+  }
+});
+
+// ── Chart 5: Distribuição de vigor no pico ──
+new Chart(document.getElementById('laudoChart5'), {
+  type: 'bar',
+  data: {
+    labels: ['Silagem 4.0','Silagem Conv.','Grão Conv.','Grão 4.0'],
+    datasets: [
+      { label:'Solo',       data:[1.1,1.4,3.4,3.4], backgroundColor:'#8b7355', borderRadius:3 },
+      { label:'Veg. Baixa', data:[0.8,0.8,4.5,4.7], backgroundColor:'#8db87a', borderRadius:3 },
+      { label:'Veg. Mod.',  data:[1.3,3.5,5.8,8.0], backgroundColor:'#4d9e5e', borderRadius:3 },
+      { label:'Veg. Alta',  data:[13.0,19.4,19.6,21.5], backgroundColor:'#2a7a3c', borderRadius:3 },
+      { label:'Veg. Densa', data:[82.2,75.0,66.7,62.1], backgroundColor:GREEN, borderRadius:3 }
+    ]
+  },
+  options: {
+    ...lb(),
+    plugins: { ...lb().plugins, tooltip: makeDeltaTooltipSimple('%') },
+    scales: {
+      x: { stacked:true, grid:{color:GRID}, ticks:{color:TICK} },
+      y: { stacked:true, grid:{color:GRID}, max:100,
+           ticks:{color:TICK, callback:v=>v+'%'},
+           title:{display:true,text:'% pixels',color:TICK} }
+    }
+  }
+});
 
 
-
-</script>
 <div id="imageLightbox" class="lightbox-modal" onclick="closeLightbox()">
   <img id="lightboxImg" class="lightbox-content" src="" alt="Imagem ampliada">
 </div>
